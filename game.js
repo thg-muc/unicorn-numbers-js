@@ -179,25 +179,54 @@ class GameController {
     const choicesContainer = document.getElementById('choices')
     choicesContainer.innerHTML = ''
 
-    // Set grid layout based on number of choices
+    // Define varied colors and fonts for visual variety (avoiding red, green, purple, black, white)
+    const colors = [
+      'bg-blue-500 hover:bg-blue-600',
+      'bg-yellow-500 hover:bg-yellow-600',
+      'bg-pink-500 hover:bg-pink-600',
+      'bg-indigo-500 hover:bg-indigo-600',
+      'bg-orange-500 hover:bg-orange-600',
+      'bg-teal-500 hover:bg-teal-600',
+      'bg-cyan-500 hover:bg-cyan-600',
+      'bg-amber-500 hover:bg-amber-600',
+      'bg-rose-500 hover:bg-rose-600',
+      'bg-sky-500 hover:bg-sky-600'
+    ]
+    
+    const fonts = [
+      'font-inter font-black',
+      'font-comic font-bold',
+      'font-fredoka font-semibold',
+      'font-nunito font-black',
+      'font-poppins font-bold',
+      'font-inter font-extrabold',
+      'font-comic font-bold'
+    ]
+
+    // Set grid layout based on number of choices with larger buttons
     if (choices.length === 3) {
-      choicesContainer.className = 'grid grid-cols-3 gap-4 max-w-md mx-auto'
+      choicesContainer.className = 'grid grid-cols-3 gap-2 max-w-full mx-auto'
     } else if (choices.length === 5) {
       choicesContainer.className =
-        'grid grid-cols-3 md:grid-cols-5 gap-4 max-w-2xl mx-auto'
+        'grid grid-cols-3 md:grid-cols-5 gap-2 max-w-full mx-auto'
     } else if (choices.length === 7) {
       choicesContainer.className =
-        'grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 max-w-4xl mx-auto'
+        'grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 max-w-full mx-auto'
     } else {
       choicesContainer.className =
-        'grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto'
+        'grid grid-cols-2 md:grid-cols-4 gap-2 max-w-full mx-auto'
     }
 
-    choices.forEach(choice => {
+    choices.forEach((choice, index) => {
       const button = document.createElement('button')
       button.textContent = choice
+      
+      // Apply varied colors and fonts
+      const colorClass = colors[index % colors.length]
+      const fontClass = fonts[index % fonts.length]
+      
       button.className =
-        'bg-blue-500 hover:bg-blue-600 text-white text-5xl md:text-6xl lg:text-7xl w-24 h-24 md:w-32 md:h-32 lg:w-36 lg:h-36 rounded-lg tap-target transition-all duration-200 transform hover:scale-105 flex items-center justify-center font-bold'
+        `${colorClass} text-white text-6xl md:text-7xl lg:text-8xl w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${fontClass}`
       button.addEventListener('click', () =>
         this.handleChoice(choice, targetNumber)
       )
@@ -212,13 +241,15 @@ class GameController {
     // Visual feedback
     const buttons = document.querySelectorAll('#choices button')
     buttons.forEach(button => {
+      const currentFont = button.className.match(/font-\w+/g)?.join(' ') || 'font-bold'
+      
       if (button.textContent == selectedChoice) {
         button.className = isCorrect
-          ? 'bg-green-500 text-white text-5xl md:text-6xl lg:text-7xl w-24 h-24 md:w-32 md:h-32 lg:w-36 lg:h-36 rounded-lg tap-target transition-all duration-200 flex items-center justify-center font-bold'
-          : 'bg-red-500 text-white text-5xl md:text-6xl lg:text-7xl w-24 h-24 md:w-32 md:h-32 lg:w-36 lg:h-36 rounded-lg tap-target transition-all duration-200 flex items-center justify-center font-bold'
+          ? `bg-green-500 hover:bg-green-600 text-white text-6xl md:text-7xl lg:text-8xl w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${currentFont}`
+          : `bg-red-500 hover:bg-red-600 text-white text-6xl md:text-7xl lg:text-8xl w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${currentFont}`
       } else if (button.textContent == targetNumber && !isCorrect) {
         button.className =
-          'bg-green-300 text-white text-5xl md:text-6xl lg:text-7xl w-24 h-24 md:w-32 md:h-32 lg:w-36 lg:h-36 rounded-lg tap-target transition-all duration-200 flex items-center justify-center font-bold'
+          `bg-green-300 hover:bg-green-400 text-white text-6xl md:text-7xl lg:text-8xl w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${currentFont}`
       }
     })
 
