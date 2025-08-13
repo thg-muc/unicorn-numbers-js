@@ -267,9 +267,11 @@ class GameController {
         button.className.match(/font-\w+/g)?.join(' ') || 'font-bold'
 
       if (button.textContent == selectedChoice) {
-        button.className = isCorrect
-          ? `bg-green-500 hover:bg-green-600 text-white text-6xl md:text-7xl lg:text-8xl w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${currentFont}`
-          : `bg-red-500 hover:bg-red-600 text-white text-6xl md:text-7xl lg:text-8xl w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${currentFont}`
+        if (isCorrect) {
+          button.className = `bg-green-500 hover:bg-green-600 text-white text-6xl md:text-7xl lg:text-8xl w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center success-animation sparkle-effect ${currentFont}`
+        } else {
+          button.className = `bg-red-500 hover:bg-red-600 text-white text-6xl md:text-7xl lg:text-8xl w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${currentFont}`
+        }
       } else if (button.textContent == targetNumber && !isCorrect) {
         button.className = `bg-green-300 hover:bg-green-400 text-white text-6xl md:text-7xl lg:text-8xl w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${currentFont}`
       }
@@ -278,11 +280,53 @@ class GameController {
     // Disable all buttons temporarily
     buttons.forEach(button => (button.disabled = true))
 
-    // Move to next round after a short delay
+    // Move to next round with smooth transition
     setTimeout(() => {
+      this.transitionToNextRound()
+    }, 1000) // Reduced from 1500ms to 1000ms to match shorter animation
+  }
+
+  transitionToNextRound() {
+    const choicesContainer = document.getElementById('choices')
+
+    // Fade out only the choice buttons
+    choicesContainer.classList.add('fade-out')
+
+    setTimeout(() => {
+      // Move to next round
       this.gameSession.nextRound()
-      this.startNewRound()
-    }, 1500)
+
+      // Check if we need to show presentation or go directly to choices
+      if (this.gameSession.isGameComplete()) {
+        this.showEndScreen()
+        return
+      }
+
+      if (this.gameSession.currentRepetition === 0) {
+        // New round - show number presentation
+        this.showNumberPresentation()
+      } else {
+        // Same round, next repetition - show new choices with fade-in
+        this.showNewChoicesWithFadeIn()
+      }
+    }, 200) // Wait for fade-out to complete
+  }
+
+  showNewChoicesWithFadeIn() {
+    const choicesContainer = document.getElementById('choices')
+
+    // Update round display and generate new choices
+    this.updateRoundDisplay()
+    this.generateChoices()
+
+    // Remove fade-out and add fade-in to choices only
+    choicesContainer.classList.remove('fade-out')
+    choicesContainer.classList.add('fade-in')
+
+    // Remove fade-in class after animation completes
+    setTimeout(() => {
+      choicesContainer.classList.remove('fade-in')
+    }, 200)
   }
 
   showPresentationScreen() {

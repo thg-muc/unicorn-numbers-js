@@ -60,6 +60,120 @@
           opacity: 1;
         }
       }
+
+      /* Success animation for correct answers */
+      .success-animation {
+        animation: successCelebration 1s ease-out;
+        box-shadow:
+          0 0 20px #10b981,
+          0 0 40px #10b981,
+          0 0 60px #10b981;
+      }
+
+      @keyframes successCelebration {
+        0% {
+          transform: scale(1);
+          box-shadow: 0 0 5px #10b981;
+        }
+        25% {
+          transform: scale(1.15);
+          box-shadow:
+            0 0 25px #10b981,
+            0 0 50px #10b981,
+            0 0 75px #10b981;
+        }
+        50% {
+          transform: scale(1.1);
+          box-shadow:
+            0 0 30px #10b981,
+            0 0 60px #10b981,
+            0 0 90px #10b981;
+        }
+        75% {
+          transform: scale(1.05);
+          box-shadow:
+            0 0 20px #10b981,
+            0 0 40px #10b981,
+            0 0 60px #10b981;
+        }
+        100% {
+          transform: scale(1);
+          box-shadow:
+            0 0 10px #10b981,
+            0 0 20px #10b981,
+            0 0 30px #10b981;
+        }
+      }
+
+      /* Sparkle effect for success */
+      .sparkle-effect {
+        position: relative;
+        overflow: visible;
+      }
+
+      .sparkle-effect::before,
+      .sparkle-effect::after {
+        content: '✨';
+        position: absolute;
+        font-size: 2rem;
+        animation: sparkle 1s ease-out;
+        pointer-events: none;
+      }
+
+      .sparkle-effect::before {
+        top: -10px;
+        right: -10px;
+        animation-delay: 0.2s;
+      }
+
+      .sparkle-effect::after {
+        bottom: -10px;
+        left: -10px;
+        animation-delay: 0.4s;
+      }
+
+      @keyframes sparkle {
+        0% {
+          transform: scale(0) rotate(0deg);
+          opacity: 0;
+        }
+        50% {
+          transform: scale(1.2) rotate(180deg);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(0) rotate(360deg);
+          opacity: 0;
+        }
+      }
+
+      /* Smooth transition animations */
+      .fade-out {
+        animation: fadeOut 200ms ease-out forwards;
+      }
+
+      .fade-in {
+        animation: fadeIn 200ms ease-in forwards;
+        opacity: 0;
+      }
+
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0;
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
     </style>
   </head>
   <body
