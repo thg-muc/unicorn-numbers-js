@@ -130,14 +130,23 @@ class GameController {
       roundDisplay
     document.getElementById('presentation-total-rounds').textContent =
       this.gameSession.totalRounds
-    document.getElementById('presented-number').textContent =
-      this.gameSession.getCurrentTargetNumber()
 
-    // Reset animation by removing and re-adding the class
     const numberElement = document.getElementById('presented-number')
-    numberElement.classList.remove('number-presentation')
+
+    // Set number content while hidden
+    numberElement.textContent = this.gameSession.getCurrentTargetNumber()
+
+    // Reset to hidden state, then animate
+    numberElement.className = numberElement.className.replace(
+      'number-presentation',
+      'number-hidden'
+    )
+
     setTimeout(() => {
-      numberElement.classList.add('number-presentation')
+      numberElement.className = numberElement.className.replace(
+        'number-hidden',
+        'number-presentation'
+      )
     }, 10)
   }
 
