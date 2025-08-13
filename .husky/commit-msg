@@ -17,3 +17,8 @@ if ! grep -qE "$commit_regex" "$1"; then
     echo ""
     exit 1
 fi
+
+# Run local personal validation if file exists
+if [ -f "$(dirname -- "$0")/commit-msg-local" ]; then
+    "$(dirname -- "$0")/commit-msg-local" "$1"
+fi
