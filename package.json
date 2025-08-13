@@ -1,0 +1,28 @@
+{
+  "name": "unicorn-numbers-js",
+  "version": "1.0.0",
+  "description": "Educational number recognition game for children",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx http-server -p 3000 -o",
+    "build": "echo 'Build complete - static files ready'",
+    "test": "echo 'No tests specified yet'",
+    "lint": "npx prettier --check .",
+    "format": "npx prettier --write .",
+    "prepare": "husky install"
+  },
+  "keywords": ["education", "game", "numbers", "children", "web"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "prettier": "^3.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.0.0"
+  },
+  "lint-staged": {
+    "*.{js,html,css,md}": [
+      "prettier --write"
+    ]
+  }
+}
