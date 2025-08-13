@@ -96,7 +96,21 @@ class GameController {
       return
     }
 
-    this.showNumberPresentation()
+    const targetNumber = this.gameSession.getCurrentTargetNumber()
+    const rep = this.gameSession.currentRepetition
+    console.log(
+      `Round ${this.gameSession.currentRound + 1}, Rep ${rep + 1}/3, Target: ${targetNumber}`
+    )
+
+    // Only show number presentation on first repetition of each round
+    if (this.gameSession.currentRepetition === 0) {
+      console.log('→ Showing number presentation')
+      this.showNumberPresentation()
+    } else {
+      console.log('→ Going directly to choices (repetition)')
+      // Go directly to choices for subsequent repetitions
+      this.continueToChoices()
+    }
   }
 
   showNumberPresentation() {
@@ -190,9 +204,9 @@ class GameController {
       'bg-cyan-500 hover:bg-cyan-600',
       'bg-amber-500 hover:bg-amber-600',
       'bg-rose-500 hover:bg-rose-600',
-      'bg-sky-500 hover:bg-sky-600'
+      'bg-sky-500 hover:bg-sky-600',
     ]
-    
+
     const fonts = [
       'font-inter font-black',
       'font-comic font-bold',
@@ -200,7 +214,7 @@ class GameController {
       'font-nunito font-black',
       'font-poppins font-bold',
       'font-inter font-extrabold',
-      'font-comic font-bold'
+      'font-comic font-bold',
     ]
 
     // Set grid layout based on number of choices with larger buttons
@@ -220,13 +234,12 @@ class GameController {
     choices.forEach((choice, index) => {
       const button = document.createElement('button')
       button.textContent = choice
-      
+
       // Apply varied colors and fonts
       const colorClass = colors[index % colors.length]
       const fontClass = fonts[index % fonts.length]
-      
-      button.className =
-        `${colorClass} text-white text-6xl md:text-7xl lg:text-8xl w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${fontClass}`
+
+      button.className = `${colorClass} text-white text-6xl md:text-7xl lg:text-8xl w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${fontClass}`
       button.addEventListener('click', () =>
         this.handleChoice(choice, targetNumber)
       )
@@ -241,15 +254,15 @@ class GameController {
     // Visual feedback
     const buttons = document.querySelectorAll('#choices button')
     buttons.forEach(button => {
-      const currentFont = button.className.match(/font-\w+/g)?.join(' ') || 'font-bold'
-      
+      const currentFont =
+        button.className.match(/font-\w+/g)?.join(' ') || 'font-bold'
+
       if (button.textContent == selectedChoice) {
         button.className = isCorrect
           ? `bg-green-500 hover:bg-green-600 text-white text-6xl md:text-7xl lg:text-8xl w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${currentFont}`
           : `bg-red-500 hover:bg-red-600 text-white text-6xl md:text-7xl lg:text-8xl w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${currentFont}`
       } else if (button.textContent == targetNumber && !isCorrect) {
-        button.className =
-          `bg-green-300 hover:bg-green-400 text-white text-6xl md:text-7xl lg:text-8xl w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${currentFont}`
+        button.className = `bg-green-300 hover:bg-green-400 text-white text-6xl md:text-7xl lg:text-8xl w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${currentFont}`
       }
     })
 
