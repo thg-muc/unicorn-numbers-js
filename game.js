@@ -204,16 +204,13 @@ class GameController {
 
     // Define varied colors and fonts for visual variety (avoiding red, green, purple, black, white)
     const colors = [
-      'bg-blue-500 hover:bg-blue-600',
-      'bg-yellow-500 hover:bg-yellow-600',
-      'bg-pink-500 hover:bg-pink-600',
-      'bg-indigo-500 hover:bg-indigo-600',
-      'bg-orange-500 hover:bg-orange-600',
-      'bg-teal-500 hover:bg-teal-600',
-      'bg-cyan-500 hover:bg-cyan-600',
-      'bg-amber-500 hover:bg-amber-600',
-      'bg-rose-500 hover:bg-rose-600',
-      'bg-sky-500 hover:bg-sky-600',
+      'bg-blue-500 hover:bg-blue-400',
+      'bg-yellow-500 hover:bg-yellow-400',
+      'bg-teal-500 hover:bg-teal-400',
+      'bg-fuchsia-500 hover:bg-fuchsia-400',
+      'bg-lime-500 hover:bg-lime-400',
+      'bg-orange-500 hover:bg-orange-400',
+      'bg-violet-500 hover:bg-violet-400',
     ]
 
     const fonts = [
