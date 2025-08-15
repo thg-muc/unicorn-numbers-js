@@ -347,11 +347,13 @@ class GameController {
 
     // Display results
     const scorePercentage = this.gameSession.getScorePercentage()
-    document.getElementById('score-display').textContent =
-      `You got ${this.gameSession.score} out of ${this.gameSession.totalSelections} correct! (${scorePercentage}%)`
+    const unicornReward = this.gameSession.getUnicornReward()
+    const unicornCount = unicornReward.length
 
-    document.getElementById('unicorn-reward').textContent =
-      this.gameSession.getUnicornReward()
+    document.getElementById('score-display').textContent =
+      `You earned ${unicornCount} unicorns ! (${scorePercentage}%)`
+
+    document.getElementById('unicorn-reward').textContent = unicornReward
   }
 }
 
