@@ -359,7 +359,32 @@ class GameController {
     // Generate distractors based on difficulty
     if (this.gameSession.difficulty === 'Easy') {
       // Easy: 3 total choices (1 number + 2 letters)
-      const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+      // Use more letters for better variety
+      const letters = [
+        'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'J',
+        'K',
+        'L',
+        'M',
+        'N',
+        'P',
+        'Q',
+        'R',
+        'S',
+        'T',
+        'V',
+        'W',
+        'X',
+        'Y',
+        'Z',
+      ]
       const shuffledLetters = this.gameSession.shuffleArray(letters)
 
       // Add 2 letter distractors for Easy mode
@@ -418,6 +443,10 @@ class GameController {
       'font-comic font-bold',
     ]
 
+    // Randomly shuffle colors and fonts for true randomness
+    const shuffledColors = this.gameSession.shuffleArray([...colors])
+    const shuffledFonts = this.gameSession.shuffleArray([...fonts])
+
     // Set grid layout based on number of choices with larger buttons
     if (choices.length === 3) {
       choicesContainer.className = 'grid grid-cols-3 gap-2 max-w-full mx-auto'
@@ -436,9 +465,9 @@ class GameController {
       const button = document.createElement('button')
       button.textContent = choice
 
-      // Apply varied colors and fonts
-      const colorClass = colors[index % colors.length]
-      const fontClass = fonts[index % fonts.length]
+      // Apply varied colors and fonts - use shuffled arrays for true randomness
+      const colorClass = shuffledColors[index % shuffledColors.length]
+      const fontClass = shuffledFonts[index % shuffledFonts.length]
 
       button.className = `${colorClass} text-white text-6xl md:text-7xl lg:text-8xl w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${fontClass}`
       button.addEventListener('click', () =>
