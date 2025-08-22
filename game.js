@@ -1,3 +1,93 @@
+// Audio Manager for number narration
+class AudioManager {
+  constructor() {
+    this.numberEmojis = {
+      0: '🥚',
+      1: '🕯️',
+      2: '🦢',
+      3: '🦋',
+      4: '⛵',
+      5: '🐍',
+      6: '🍒',
+      7: '🪃',
+      8: '⛄',
+      9: '🎈',
+    }
+    this.currentAudio = null
+    this.language = this.getStoredLanguage()
+  }
+
+  getStoredLanguage() {
+    return localStorage.getItem('unicornNumbers_language') || 'en'
+  }
+
+  setLanguage(language) {
+    this.language = language
+    localStorage.setItem('unicornNumbers_language', language)
+    this.updateLanguageUI()
+  }
+
+  updateLanguageUI() {
+    const enButton = document.getElementById('lang-en')
+    const deButton = document.getElementById('lang-de')
+
+    if (this.language === 'en') {
+      enButton.className = enButton.className.replace(
+        'bg-gray-300 hover:bg-gray-400 text-gray-700 border-transparent',
+        'bg-blue-500 hover:bg-blue-600 text-white border-blue-700'
+      )
+      deButton.className = deButton.className.replace(
+        'bg-blue-500 hover:bg-blue-600 text-white border-blue-700',
+        'bg-gray-300 hover:bg-gray-400 text-gray-700 border-transparent'
+      )
+    } else {
+      deButton.className = deButton.className.replace(
+        'bg-gray-300 hover:bg-gray-400 text-gray-700 border-transparent',
+        'bg-blue-500 hover:bg-blue-600 text-white border-blue-700'
+      )
+      enButton.className = enButton.className.replace(
+        'bg-blue-500 hover:bg-blue-600 text-white border-blue-700',
+        'bg-gray-300 hover:bg-gray-400 text-gray-700 border-transparent'
+      )
+    }
+  }
+
+  playNumberAudio(number) {
+    return new Promise((resolve, reject) => {
+      // Stop any currently playing audio
+      if (this.currentAudio) {
+        this.currentAudio.pause()
+        this.currentAudio = null
+      }
+
+      const audioPath = `assets/audio/${this.language}/${number}.mp3`
+      this.currentAudio = new Audio(audioPath)
+
+      this.currentAudio.addEventListener('ended', () => {
+        resolve()
+      })
+
+      this.currentAudio.addEventListener('error', e => {
+        console.warn(`Audio file not found: ${audioPath}`)
+        reject(e)
+      })
+
+      this.currentAudio.play()
+    })
+  }
+
+  getEmoji(number) {
+    return this.numberEmojis[number] || '❓'
+  }
+
+  stopCurrentAudio() {
+    if (this.currentAudio) {
+      this.currentAudio.pause()
+      this.currentAudio = null
+    }
+  }
+}
+
 // Game state management
 class GameSession {
   constructor() {
@@ -8,6 +98,11 @@ class GameSession {
     this.currentRepetition = 0
     this.score = 0
     this.totalSelections = 0
+
+    // Audio and timing properties
+    this.minPresentationTime = 5000 // 5 seconds minimum for Easy mode
+    this.presentationStartTime = null
+    this.canContinue = false
 
     // Generate target numbers based on difficulty
     const allNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -72,6 +167,7 @@ class GameSession {
 class GameController {
   constructor() {
     this.gameSession = null
+    this.audioManager = new AudioManager()
     this.initializeEventListeners()
   }
 
@@ -82,6 +178,17 @@ class GameController {
     document
       .getElementById('restart-button')
       .addEventListener('click', () => this.startGame())
+
+    // Language selection event listeners
+    document
+      .getElementById('lang-en')
+      .addEventListener('click', () => this.audioManager.setLanguage('en'))
+    document
+      .getElementById('lang-de')
+      .addEventListener('click', () => this.audioManager.setLanguage('de'))
+
+    // Initialize language UI
+    this.audioManager.updateLanguageUI()
   }
 
   startGame() {
@@ -113,12 +220,107 @@ class GameController {
     }
   }
 
-  showNumberPresentation() {
+  async showNumberPresentation() {
     this.showPresentationScreen()
     this.updatePresentationDisplay()
+
+    // Record presentation start time and disable continue initially
+    this.gameSession.presentationStartTime = Date.now()
+    this.gameSession.canContinue = false
+
+    const targetNumber = this.gameSession.getCurrentTargetNumber()
+    const emoji = this.audioManager.getEmoji(targetNumber)
+
+    // Update emoji element
+    document.getElementById('presented-emoji').textContent = emoji
+
+    // Start playing audio
+    try {
+      this.audioManager.playNumberAudio(targetNumber)
+
+      // Schedule emoji transition after 3 seconds
+      setTimeout(() => {
+        this.triggerEmojiTransition()
+      }, 3000)
+
+      // Enable continue after minimum time (5 seconds for Easy mode)
+      setTimeout(() => {
+        this.enableContinue()
+      }, this.gameSession.minPresentationTime)
+    } catch (error) {
+      console.warn('Audio playback failed:', error)
+      // If audio fails, still show emoji after 3 seconds and enable continue after 5
+      setTimeout(() => {
+        this.triggerEmojiTransition()
+      }, 3000)
+
+      setTimeout(() => {
+        this.enableContinue()
+      }, this.gameSession.minPresentationTime)
+    }
+  }
+
+  triggerEmojiTransition() {
+    const numberElement = document.getElementById('presented-number')
+    const emojiElement = document.getElementById('presented-emoji')
+
+    // Start number fade-out
+    numberElement.classList.add('number-fade-out')
+
+    // Start emoji fade-in
+    emojiElement.classList.remove('emoji-hidden')
+    emojiElement.classList.add('emoji-fade-in')
+  }
+
+  enableContinue() {
+    this.gameSession.canContinue = true
+    const instructionElement = document.getElementById(
+      'presentation-instruction'
+    )
+    instructionElement.textContent = 'Tap to continue'
+    instructionElement.className = instructionElement.className.replace(
+      'text-gray-500',
+      'text-green-600'
+    )
+
+    // Add subtle pulse animation to indicate ready
+    const presentationScreen = document.getElementById('number-presentation')
+    presentationScreen.style.cursor = 'pointer'
   }
 
   continueToChoices() {
+    // Check if enough time has passed and continue is enabled
+    if (
+      !this.gameSession.canContinue &&
+      this.gameSession.difficulty === 'Easy'
+    ) {
+      // Show feedback that they need to wait
+      const instructionElement = document.getElementById(
+        'presentation-instruction'
+      )
+      instructionElement.textContent = 'Please wait...'
+      instructionElement.className = instructionElement.className.replace(
+        'text-gray-500',
+        'text-amber-500'
+      )
+
+      setTimeout(() => {
+        if (!this.gameSession.canContinue) {
+          instructionElement.textContent = 'Listen...'
+          instructionElement.className = instructionElement.className.replace(
+            'text-amber-500',
+            'text-gray-500'
+          )
+        }
+      }, 1000)
+      return
+    }
+
+    // Stop any ongoing audio when transitioning (except in future difficulty modes)
+    if (this.gameSession.difficulty === 'Easy') {
+      this.audioManager.stopCurrentAudio()
+    }
+
     this.showGameScreen()
     this.updateRoundDisplay()
     this.generateChoices()
@@ -132,16 +334,36 @@ class GameController {
       this.gameSession.totalRounds
 
     const numberElement = document.getElementById('presented-number')
+    const emojiElement = document.getElementById('presented-emoji')
+    const instructionElement = document.getElementById(
+      'presentation-instruction'
+    )
 
     // Set number content while hidden
     numberElement.textContent = this.gameSession.getCurrentTargetNumber()
 
-    // Reset to hidden state, then animate
-    numberElement.className = numberElement.className.replace(
-      'number-presentation',
-      'number-hidden'
+    // Reset all elements to initial state
+    numberElement.className =
+      numberElement.className
+        .replace('number-presentation', '')
+        .replace('number-fade-out', '')
+        .trim() + ' number-hidden'
+
+    emojiElement.className =
+      emojiElement.className.replace('emoji-fade-in', '').trim() +
+      ' emoji-hidden'
+
+    // Reset instruction text
+    instructionElement.textContent = 'Listen...'
+    instructionElement.className = instructionElement.className.replace(
+      'text-green-600',
+      'text-gray-500'
     )
 
+    // Reset presentation screen cursor
+    document.getElementById('number-presentation').style.cursor = 'default'
+
+    // Start number animation after brief delay
     setTimeout(() => {
       numberElement.className = numberElement.className.replace(
         'number-hidden',
