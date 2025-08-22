@@ -14,42 +14,16 @@ class AudioManager {
       9: '🎈',
     }
     this.currentAudio = null
-    this.language = this.getStoredLanguage()
-  }
-
-  getStoredLanguage() {
-    return localStorage.getItem('unicornNumbers_language') || 'en'
+    this.language = null // Will be set when user chooses language
   }
 
   setLanguage(language) {
     this.language = language
-    localStorage.setItem('unicornNumbers_language', language)
-    this.updateLanguageUI()
+    // No persistence - language choice is only for current session
   }
 
   updateLanguageUI() {
-    const enButton = document.getElementById('lang-en')
-    const deButton = document.getElementById('lang-de')
-
-    if (this.language === 'en') {
-      enButton.className = enButton.className.replace(
-        'bg-gray-300 hover:bg-gray-400 text-gray-700 border-transparent',
-        'bg-blue-500 hover:bg-blue-600 text-white border-blue-700'
-      )
-      deButton.className = deButton.className.replace(
-        'bg-blue-500 hover:bg-blue-600 text-white border-blue-700',
-        'bg-gray-300 hover:bg-gray-400 text-gray-700 border-transparent'
-      )
-    } else {
-      deButton.className = deButton.className.replace(
-        'bg-gray-300 hover:bg-gray-400 text-gray-700 border-transparent',
-        'bg-blue-500 hover:bg-blue-600 text-white border-blue-700'
-      )
-      enButton.className = enButton.className.replace(
-        'bg-blue-500 hover:bg-blue-600 text-white border-blue-700',
-        'bg-gray-300 hover:bg-gray-400 text-gray-700 border-transparent'
-      )
-    }
+    // No longer needed - buttons are static and start the game directly
   }
 
   playNumberAudio(number) {
@@ -173,22 +147,21 @@ class GameController {
 
   initializeEventListeners() {
     document
-      .getElementById('start-button')
-      .addEventListener('click', () => this.startGame())
-    document
       .getElementById('restart-button')
       .addEventListener('click', () => this.startGame())
 
-    // Language selection event listeners
+    // Language selection starts the game immediately
     document
       .getElementById('lang-en')
-      .addEventListener('click', () => this.audioManager.setLanguage('en'))
+      .addEventListener('click', () => this.startGameWithLanguage('en'))
     document
       .getElementById('lang-de')
-      .addEventListener('click', () => this.audioManager.setLanguage('de'))
+      .addEventListener('click', () => this.startGameWithLanguage('de'))
+  }
 
-    // Initialize language UI
-    this.audioManager.updateLanguageUI()
+  startGameWithLanguage(language) {
+    this.audioManager.setLanguage(language)
+    this.startGame()
   }
 
   startGame() {
