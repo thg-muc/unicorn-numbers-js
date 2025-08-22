@@ -543,7 +543,8 @@ class GameController {
     // Display results
     const scorePercentage = this.gameSession.getScorePercentage()
     const unicornReward = this.gameSession.getUnicornReward()
-    const unicornCount = unicornReward.length
+    // Count actual unicorn emojis, not string length (emojis are 2 chars each)
+    const unicornCount = [...unicornReward].length
 
     document.getElementById('score-display').textContent =
       `You earned ${unicornCount} unicorns ! (${scorePercentage}%)`
