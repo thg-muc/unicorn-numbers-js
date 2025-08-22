@@ -211,10 +211,10 @@ class GameController {
     try {
       this.audioManager.playNumberAudio(targetNumber)
 
-      // Schedule emoji transition after 3 seconds
+      // Schedule emoji transition after 3.5 seconds
       setTimeout(() => {
         this.triggerEmojiTransition()
-      }, 3000)
+      }, 3500)
 
       // Enable continue after minimum time (5 seconds for Easy mode)
       setTimeout(() => {
@@ -222,10 +222,10 @@ class GameController {
       }, this.gameSession.minPresentationTime)
     } catch (error) {
       console.warn('Audio playback failed:', error)
-      // If audio fails, still show emoji after 3 seconds and enable continue after 5
+      // If audio fails, still show emoji after 3.5 seconds and enable continue after 5
       setTimeout(() => {
         this.triggerEmojiTransition()
-      }, 3000)
+      }, 3500)
 
       setTimeout(() => {
         this.enableContinue()
