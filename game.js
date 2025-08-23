@@ -6,6 +6,11 @@ const translations = {
       subtitle: 'Learn the numbers 0-9!',
       languageButton: '🇬🇧 English',
     },
+    introScreen: {
+      title: '🦄 Unicorn Numbers',
+      subtitle: 'Learn the numbers 0-9!',
+      pressToPlay: 'Press to play',
+    },
     presentationScreen: {
       round: 'Round',
       of: 'of',
@@ -30,6 +35,11 @@ const translations = {
       title: '🦄 Einhorn-Zahlen',
       subtitle: 'Lerne die Zahlen 0-9!',
       languageButton: '🇩🇪 Deutsch',
+    },
+    introScreen: {
+      title: '🦄 Einhorn-Zahlen',
+      subtitle: 'Lerne die Zahlen 0-9!',
+      pressToPlay: 'Zum Spielen tippen',
     },
     presentationScreen: {
       round: 'Runde',
@@ -69,12 +79,11 @@ class AudioManager {
     }
     this.currentAudio = null
     this.language = null // Will be set when user chooses language
-    this.introAudio = null // For intro audio playback
   }
 
   setLanguage(language) {
     this.language = language
-    // Save language preference for intro audio on next visit
+    // Save language preference for session
     localStorage.setItem('preferredLanguage', language)
     this.updateUILanguage()
   }
@@ -144,33 +153,17 @@ class AudioManager {
   }
 
   playIntroAudio() {
-    // Determine which language intro to play
-    let introLanguage = this.detectIntroLanguage()
+    // Simple intro audio playback on user interaction
+    const audioPath = `assets/audio/${this.language}/intro.mp3`
+    const introAudio = new Audio(audioPath)
 
-    const audioPath = `assets/audio/${introLanguage}/intro.mp3`
-    this.introAudio = new Audio(audioPath)
-
-    this.introAudio.onerror = () => {
+    introAudio.onerror = () => {
       console.warn(`Could not load intro audio: ${audioPath}`)
     }
 
-    this.introAudio.play().catch(error => {
+    introAudio.play().catch(error => {
       console.warn('Could not play intro audio:', error)
     })
-  }
-
-  detectIntroLanguage() {
-    // First check: saved language preference from previous visits
-    const savedLanguage = localStorage.getItem('preferredLanguage')
-    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'de')) {
-      return savedLanguage
-    }
-
-    // Second check: browser language detection
-    const browserLanguage = navigator.language || navigator.userLanguage || 'en'
-
-    // If browser language starts with 'de', use German, otherwise English
-    return browserLanguage.toLowerCase().startsWith('de') ? 'de' : 'en'
   }
 }
 
@@ -255,27 +248,39 @@ class GameController {
     this.gameSession = null
     this.audioManager = new AudioManager()
     this.initializeEventListeners()
-    // Play intro audio on page load
-    this.audioManager.playIntroAudio()
   }
 
   initializeEventListeners() {
     document
       .getElementById('restart-button')
-      .addEventListener('click', () => this.startGame())
+      .addEventListener('click', () => this.showIntroScreen())
 
-    // Language selection starts the game immediately
+    // Language selection plays audio and shows intro screen
     document
       .getElementById('lang-en')
-      .addEventListener('click', () => this.startGameWithLanguage('en'))
+      .addEventListener('click', () => this.selectLanguage('en'))
     document
       .getElementById('lang-de')
-      .addEventListener('click', () => this.startGameWithLanguage('de'))
+      .addEventListener('click', () => this.selectLanguage('de'))
+
+    // Play button starts the actual game
+    document
+      .getElementById('play-button')
+      .addEventListener('click', () => this.startGame())
   }
 
   startGameWithLanguage(language) {
     this.audioManager.setLanguage(language)
     this.startGame()
+  }
+
+  selectLanguage(language) {
+    // Set language and play intro audio
+    this.audioManager.setLanguage(language)
+    this.audioManager.playIntroAudio()
+
+    // Show intro screen
+    this.showIntroScreen()
   }
 
   startGame() {
@@ -674,19 +679,31 @@ class GameController {
 
   showPresentationScreen() {
     document.getElementById('start-screen').classList.add('hidden')
+    document.getElementById('intro-screen').classList.add('hidden')
     document.getElementById('game-screen').classList.add('hidden')
     document.getElementById('end-screen').classList.add('hidden')
     document.getElementById('number-presentation').classList.remove('hidden')
   }
 
+  showIntroScreen() {
+    document.getElementById('start-screen').classList.add('hidden')
+    document.getElementById('number-presentation').classList.add('hidden')
+    document.getElementById('game-screen').classList.add('hidden')
+    document.getElementById('end-screen').classList.add('hidden')
+    document.getElementById('intro-screen').classList.remove('hidden')
+  }
+
   showGameScreen() {
     document.getElementById('start-screen').classList.add('hidden')
+    document.getElementById('intro-screen').classList.add('hidden')
     document.getElementById('number-presentation').classList.add('hidden')
     document.getElementById('end-screen').classList.add('hidden')
     document.getElementById('game-screen').classList.remove('hidden')
   }
 
   showEndScreen() {
+    document.getElementById('start-screen').classList.add('hidden')
+    document.getElementById('intro-screen').classList.add('hidden')
     document.getElementById('game-screen').classList.add('hidden')
     document.getElementById('number-presentation').classList.add('hidden')
     document.getElementById('end-screen').classList.remove('hidden')
