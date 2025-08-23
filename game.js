@@ -69,11 +69,13 @@ class AudioManager {
     }
     this.currentAudio = null
     this.language = null // Will be set when user chooses language
+    this.introAudio = null // For intro audio playback
   }
 
   setLanguage(language) {
     this.language = language
-    // No persistence - language choice is only for current session
+    // Save language preference for intro audio on next visit
+    localStorage.setItem('preferredLanguage', language)
     this.updateUILanguage()
   }
 
@@ -139,6 +141,36 @@ class AudioManager {
       this.currentAudio.pause()
       this.currentAudio = null
     }
+  }
+
+  playIntroAudio() {
+    // Determine which language intro to play
+    let introLanguage = this.detectIntroLanguage()
+
+    const audioPath = `assets/audio/${introLanguage}/intro.mp3`
+    this.introAudio = new Audio(audioPath)
+
+    this.introAudio.onerror = () => {
+      console.warn(`Could not load intro audio: ${audioPath}`)
+    }
+
+    this.introAudio.play().catch(error => {
+      console.warn('Could not play intro audio:', error)
+    })
+  }
+
+  detectIntroLanguage() {
+    // First check: saved language preference from previous visits
+    const savedLanguage = localStorage.getItem('preferredLanguage')
+    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'de')) {
+      return savedLanguage
+    }
+
+    // Second check: browser language detection
+    const browserLanguage = navigator.language || navigator.userLanguage || 'en'
+
+    // If browser language starts with 'de', use German, otherwise English
+    return browserLanguage.toLowerCase().startsWith('de') ? 'de' : 'en'
   }
 }
 
@@ -223,6 +255,8 @@ class GameController {
     this.gameSession = null
     this.audioManager = new AudioManager()
     this.initializeEventListeners()
+    // Play intro audio on page load
+    this.audioManager.playIntroAudio()
   }
 
   initializeEventListeners() {
