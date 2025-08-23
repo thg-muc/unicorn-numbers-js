@@ -223,11 +223,17 @@
         id="start-screen"
         class="text-center bg-white rounded-lg shadow-lg p-6 md:p-8 w-full max-w-md md:max-w-2xl"
       >
-        <h1 class="text-5xl md:text-6xl text-purple-600 mb-6 md:mb-8">
+        <h1
+          class="text-5xl md:text-6xl text-purple-600 mb-6 md:mb-8"
+          data-i18n="startScreen.title"
+        >
           🦄 Unicorn Numbers
         </h1>
-        <p class="text-2xl md:text-3xl text-gray-700 mb-8 md:mb-10">
-          Learn numbers 0-9!
+        <p
+          class="text-2xl md:text-3xl text-gray-700 mb-8 md:mb-10"
+          data-i18n="startScreen.subtitle"
+        >
+          Learn the numbers 0-9!
         </p>
         <!-- Language Selection - Click to Start -->
         <div
@@ -256,7 +262,9 @@
       >
         <div class="mb-6 md:mb-4">
           <span class="text-xl md:text-2xl text-gray-600"
-            >Round <span id="presentation-round-counter">1</span> of
+            ><span data-i18n="presentationScreen.round">Round</span>
+            <span id="presentation-round-counter">1</span>
+            <span data-i18n="presentationScreen.of">of</span>
             <span id="presentation-total-rounds">5</span></span
           >
         </div>
@@ -277,6 +285,7 @@
         <p
           id="presentation-instruction"
           class="text-xl md:text-2xl text-gray-500"
+          data-i18n="presentationScreen.listen"
         >
           Listen...
         </p>
@@ -289,12 +298,15 @@
       >
         <div class="mb-4 md:mb-6">
           <span class="text-xl md:text-2xl text-gray-600"
-            >Round <span id="round-counter">1</span> of
+            ><span data-i18n="gameScreen.round">Round</span>
+            <span id="round-counter">1</span>
+            <span data-i18n="gameScreen.of">of</span>
             <span id="total-rounds">5</span></span
           >
         </div>
         <h2
           class="text-4xl md:text-5xl lg:text-6xl text-purple-600 mb-8 md:mb-12"
+          data-i18n="gameScreen.instruction"
         >
           Find the right number!
         </h2>
@@ -311,7 +323,10 @@
         id="end-screen"
         class="hidden text-center bg-white rounded-lg shadow-lg p-6 md:p-8 w-full max-w-md md:max-w-2xl"
       >
-        <h2 class="text-4xl md:text-5xl text-purple-600 mb-6 md:mb-8">
+        <h2
+          class="text-4xl md:text-5xl text-purple-600 mb-6 md:mb-8"
+          data-i18n="endScreen.greatJob"
+        >
           Great Job!
         </h2>
         <div
@@ -325,6 +340,7 @@
         <button
           id="restart-button"
           class="bg-purple-600 hover:bg-purple-700 text-white text-2xl md:text-3xl px-8 py-4 md:px-12 md:py-6 rounded-lg tap-target transition-colors w-full md:w-auto"
+          data-i18n="endScreen.playAgain"
         >
           Play Again
         </button>

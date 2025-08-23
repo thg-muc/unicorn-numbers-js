@@ -1,4 +1,58 @@
-// Audio Manager for number narration
+// Centralized translations for all UI text
+const translations = {
+  en: {
+    startScreen: {
+      title: '🦄 Unicorn Numbers',
+      subtitle: 'Learn the numbers 0-9!',
+      languageButton: '🇬🇧 English',
+    },
+    presentationScreen: {
+      round: 'Round',
+      of: 'of',
+      listen: 'Listen...',
+      tapToContinue: 'Tap to continue',
+      pleaseWait: 'Please wait...',
+    },
+    gameScreen: {
+      round: 'Round',
+      of: 'of',
+      instruction: 'Find the right number!',
+    },
+    endScreen: {
+      greatJob: 'Great Job!',
+      playAgain: 'Play Again',
+      scoreText: (count, percentage) =>
+        `You earned ${count} unicorns! (${percentage}%)`,
+    },
+  },
+  de: {
+    startScreen: {
+      title: '🦄 Einhorn-Zahlen',
+      subtitle: 'Lerne die Zahlen 0-9!',
+      languageButton: '🇩🇪 Deutsch',
+    },
+    presentationScreen: {
+      round: 'Runde',
+      of: 'von',
+      listen: 'Hör zu...',
+      tapToContinue: 'Tippe zum Fortfahren',
+      pleaseWait: 'Bitte warten...',
+    },
+    gameScreen: {
+      round: 'Runde',
+      of: 'von',
+      instruction: 'Finde die richtige Zahl!',
+    },
+    endScreen: {
+      greatJob: 'Gut gemacht!',
+      playAgain: 'Nochmal spielen',
+      scoreText: (count, percentage) =>
+        `Du hast ${count} Einhörner verdient! (${percentage}%)`,
+    },
+  },
+}
+
+// Audio Manager for number narration and translations
 class AudioManager {
   constructor() {
     this.numberEmojis = {
@@ -20,10 +74,36 @@ class AudioManager {
   setLanguage(language) {
     this.language = language
     // No persistence - language choice is only for current session
+    this.updateUILanguage()
   }
 
-  updateLanguageUI() {
-    // No longer needed - buttons are static and start the game directly
+  getTranslation(key) {
+    const keys = key.split('.')
+    let translation = translations[this.language]
+
+    for (const k of keys) {
+      translation = translation[k]
+      if (!translation) {
+        console.warn(`Translation not found for key: ${key}`)
+        return key
+      }
+    }
+
+    return translation
+  }
+
+  updateUILanguage() {
+    if (!this.language) return
+
+    // Update all elements with data-i18n attributes
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+      const key = element.getAttribute('data-i18n')
+      const translation = this.getTranslation(key)
+
+      if (typeof translation === 'string') {
+        element.textContent = translation
+      }
+    })
   }
 
   playNumberAudio(number) {
@@ -250,7 +330,9 @@ class GameController {
     const instructionElement = document.getElementById(
       'presentation-instruction'
     )
-    instructionElement.textContent = 'Tap to continue'
+    instructionElement.textContent = this.audioManager.getTranslation(
+      'presentationScreen.tapToContinue'
+    )
     instructionElement.className = instructionElement.className.replace(
       'text-gray-500',
       'text-green-600'
@@ -271,7 +353,9 @@ class GameController {
       const instructionElement = document.getElementById(
         'presentation-instruction'
       )
-      instructionElement.textContent = 'Please wait...'
+      instructionElement.textContent = this.audioManager.getTranslation(
+        'presentationScreen.pleaseWait'
+      )
       instructionElement.className = instructionElement.className.replace(
         'text-gray-500',
         'text-amber-500'
@@ -279,7 +363,9 @@ class GameController {
 
       setTimeout(() => {
         if (!this.gameSession.canContinue) {
-          instructionElement.textContent = 'Listen...'
+          instructionElement.textContent = this.audioManager.getTranslation(
+            'presentationScreen.listen'
+          )
           instructionElement.className = instructionElement.className.replace(
             'text-amber-500',
             'text-gray-500'
@@ -327,7 +413,9 @@ class GameController {
       ' emoji-hidden'
 
     // Reset instruction text
-    instructionElement.textContent = 'Listen...'
+    instructionElement.textContent = this.audioManager.getTranslation(
+      'presentationScreen.listen'
+    )
     instructionElement.className = instructionElement.className.replace(
       'text-green-600',
       'text-gray-500'
@@ -575,8 +663,11 @@ class GameController {
     // Count actual unicorn emojis, not string length (emojis are 2 chars each)
     const unicornCount = [...unicornReward].length
 
-    document.getElementById('score-display').textContent =
-      `You earned ${unicornCount} unicorns ! (${scorePercentage}%)`
+    const scoreText = this.audioManager.getTranslation('endScreen.scoreText')
+    document.getElementById('score-display').textContent = scoreText(
+      unicornCount,
+      scorePercentage
+    )
 
     document.getElementById('unicorn-reward').textContent = unicornReward
   }
