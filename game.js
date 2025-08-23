@@ -78,6 +78,7 @@ class AudioManager {
       9: '🎈',
     }
     this.currentAudio = null
+    this.introAudio = null // For intro audio playback
     this.language = null // Will be set when user chooses language
   }
 
@@ -155,15 +156,22 @@ class AudioManager {
   playIntroAudio() {
     // Simple intro audio playback on user interaction
     const audioPath = `assets/audio/${this.language}/intro.mp3`
-    const introAudio = new Audio(audioPath)
+    this.introAudio = new Audio(audioPath)
 
-    introAudio.onerror = () => {
+    this.introAudio.onerror = () => {
       console.warn(`Could not load intro audio: ${audioPath}`)
     }
 
-    introAudio.play().catch(error => {
+    this.introAudio.play().catch(error => {
       console.warn('Could not play intro audio:', error)
     })
+  }
+
+  stopIntroAudio() {
+    if (this.introAudio) {
+      this.introAudio.pause()
+      this.introAudio = null
+    }
   }
 }
 
@@ -253,7 +261,7 @@ class GameController {
   initializeEventListeners() {
     document
       .getElementById('restart-button')
-      .addEventListener('click', () => this.showIntroScreen())
+      .addEventListener('click', () => this.startGame())
 
     // Language selection plays audio and shows intro screen
     document
@@ -284,6 +292,9 @@ class GameController {
   }
 
   startGame() {
+    // Stop intro audio to prevent overlap
+    this.audioManager.stopIntroAudio()
+
     this.gameSession = new GameSession()
     this.showGameScreen()
     this.startNewRound()

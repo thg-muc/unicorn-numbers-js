@@ -210,6 +210,55 @@
           opacity: 1;
         }
       }
+
+      /* Delayed fade-in for play button */
+      @keyframes fadeInDelayed {
+        0%,
+        25% {
+          opacity: 0;
+          pointer-events: none;
+        }
+        100% {
+          opacity: 1;
+          pointer-events: auto;
+        }
+      }
+
+      .button-fade-in-delayed {
+        opacity: 0;
+        animation: fadeInDelayed 4s ease-in-out forwards;
+      }
+
+      /* Pulse animation for subtitle that stops when button appears */
+      @keyframes pulseSubtitle {
+        0%,
+        75% {
+          transform: scale(1);
+        }
+        12.5% {
+          transform: scale(1.02);
+        }
+        25% {
+          transform: scale(1);
+        }
+        37.5% {
+          transform: scale(1.02);
+        }
+        50% {
+          transform: scale(1);
+        }
+        62.5% {
+          transform: scale(1.02);
+        }
+        75%,
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .subtitle-pulse {
+        animation: pulseSubtitle 4s ease-in-out forwards;
+      }
     </style>
   </head>
   <body
@@ -260,14 +309,14 @@
           🦄 Unicorn Numbers
         </h1>
         <p
-          class="text-2xl md:text-3xl text-gray-700 mb-8 md:mb-10"
+          class="text-2xl md:text-3xl text-gray-700 mb-8 md:mb-10 subtitle-pulse"
           data-i18n="introScreen.subtitle"
         >
           Learn the numbers 0-9!
         </p>
         <button
           id="play-button"
-          class="bg-purple-600 hover:bg-purple-700 text-white text-3xl md:text-4xl px-12 py-6 md:px-10 md:py-5 rounded-lg tap-target transition-colors pulse-animation"
+          class="bg-purple-600 hover:bg-purple-700 text-white text-3xl md:text-4xl px-12 py-6 md:px-10 md:py-5 rounded-lg tap-target transition-colors button-fade-in-delayed"
           data-i18n="introScreen.pressToPlay"
         >
           Press to play
