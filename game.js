@@ -298,8 +298,17 @@ class GameController {
 
     this.gameSession = new GameSession()
 
-    // Use magical transition from intro to first game screen
-    this.magicalTransitionToGame()
+    // Check what screen we're transitioning from
+    const endScreen = document.getElementById('end-screen')
+    const isRestartFromEndScreen = !endScreen.classList.contains('hidden')
+
+    if (isRestartFromEndScreen) {
+      // Use normal transition for restart from end screen
+      this.startNewRound()
+    } else {
+      // Use magical transition from intro to first game screen
+      this.magicalTransitionToGame()
+    }
   }
 
   startNewRound() {
