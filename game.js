@@ -297,8 +297,9 @@ class GameController {
     this.audioManager.stopIntroAudio()
 
     this.gameSession = new GameSession()
-    this.showGameScreen()
-    this.startNewRound()
+
+    // Use magical transition from intro to first game screen
+    this.magicalTransitionToGame()
   }
 
   startNewRound() {
@@ -702,9 +703,176 @@ class GameController {
     this.fadeToScreen('game-screen')
   }
 
-  showEndScreen() {
-    this.fadeToScreen('end-screen')
+  magicalTransitionToGame() {
+    const introScreen = document.getElementById('intro-screen')
+    const body = document.body
 
+    // Add sparkle burst and background pulse effects
+    introScreen.classList.add('sparkle-burst', 'active')
+    body.classList.add('background-pulse')
+
+    // Start magical exit animation
+    introScreen.classList.add('magical-exit')
+
+    // After exit animation, show the next screen with magical entrance
+    setTimeout(() => {
+      // Hide intro screen
+      introScreen.classList.add('hidden')
+      introScreen.classList.remove('magical-exit', 'sparkle-burst', 'active')
+
+      // Determine what screen to show next
+      if (this.gameSession.isGameComplete()) {
+        this.showEndScreen()
+        return
+      }
+
+      const targetNumber = this.gameSession.getCurrentTargetNumber()
+      const rep = this.gameSession.currentRepetition
+
+      // Only show number presentation on first repetition of each round
+      if (this.gameSession.currentRepetition === 0) {
+        this.showNumberPresentationMagically()
+      } else {
+        this.showGameScreenMagically()
+      }
+
+      // Clean up background pulse
+      body.classList.remove('background-pulse')
+    }, 1000) // Match the magical-exit animation duration
+  }
+
+  showNumberPresentationMagically() {
+    const screen = document.getElementById('number-presentation')
+    screen.classList.remove('hidden')
+    screen.classList.add('magical-entrance')
+
+    // Update display and start the round
+    this.updatePresentationDisplay()
+
+    setTimeout(() => {
+      screen.classList.remove('magical-entrance')
+      // Continue with normal number presentation flow
+      this.startNumberPresentationFlow()
+    }, 700)
+  }
+
+  showGameScreenMagically() {
+    const screen = document.getElementById('game-screen')
+    screen.classList.remove('hidden')
+    screen.classList.add('magical-entrance')
+
+    this.updateRoundDisplay()
+    this.generateChoices()
+
+    setTimeout(() => {
+      screen.classList.remove('magical-entrance')
+    }, 700)
+  }
+
+  startNumberPresentationFlow() {
+    // Record presentation start time and disable continue initially
+    this.gameSession.presentationStartTime = Date.now()
+    this.gameSession.canContinue = false
+
+    const targetNumber = this.gameSession.getCurrentTargetNumber()
+    const emoji = this.audioManager.getEmoji(targetNumber)
+
+    // Update emoji element
+    document.getElementById('presented-emoji').textContent = emoji
+
+    // Start playing audio
+    try {
+      this.audioManager.playNumberAudio(targetNumber)
+
+      // Schedule emoji transition after 3.5 seconds
+      setTimeout(() => {
+        this.triggerEmojiTransition()
+      }, 3500)
+
+      // Enable continue after minimum time (5 seconds for Easy mode)
+      setTimeout(() => {
+        this.enableContinue()
+      }, this.gameSession.minPresentationTime)
+    } catch (error) {
+      console.warn('Audio playback failed:', error)
+      // If audio fails, still show emoji after 3.5 seconds and enable continue after 5
+      setTimeout(() => {
+        this.triggerEmojiTransition()
+      }, 3500)
+
+      setTimeout(() => {
+        this.enableContinue()
+      }, this.gameSession.minPresentationTime)
+    }
+  }
+
+  showEndScreen() {
+    this.showEndScreenMagically()
+  }
+
+  showEndScreenMagically() {
+    // Find the current visible screen for magical exit
+    const allScreens = [
+      'intro-screen',
+      'number-presentation',
+      'game-screen',
+      'end-screen',
+    ]
+    let currentScreen = null
+
+    allScreens.forEach(screenId => {
+      const element = document.getElementById(screenId)
+      if (!element.classList.contains('hidden')) {
+        currentScreen = element
+      }
+    })
+
+    if (currentScreen) {
+      const body = document.body
+
+      // Add sparkle burst and background pulse effects
+      currentScreen.classList.add('sparkle-burst', 'active')
+      body.classList.add('background-pulse')
+
+      // Start magical exit animation
+      currentScreen.classList.add('magical-exit')
+
+      // After exit animation, show end screen with magical entrance
+      setTimeout(() => {
+        // Hide current screen
+        currentScreen.classList.add('hidden')
+        currentScreen.classList.remove(
+          'magical-exit',
+          'sparkle-burst',
+          'active'
+        )
+
+        this.showEndScreenWithEntrance()
+
+        // Clean up background pulse
+        body.classList.remove('background-pulse')
+      }, 1000) // Match the magical-exit animation duration
+    } else {
+      // Fallback to normal transition if no current screen found
+      this.fadeToScreen('end-screen')
+      this.displayEndScreenResults()
+    }
+  }
+
+  showEndScreenWithEntrance() {
+    const screen = document.getElementById('end-screen')
+    screen.classList.remove('hidden')
+    screen.classList.add('magical-entrance')
+
+    // Display results immediately
+    this.displayEndScreenResults()
+
+    setTimeout(() => {
+      screen.classList.remove('magical-entrance')
+    }, 700)
+  }
+
+  displayEndScreenResults() {
     // Display results
     const scorePercentage = this.gameSession.getScorePercentage()
     const unicornReward = this.gameSession.getUnicornReward()
@@ -743,7 +911,14 @@ class GameController {
     const visibleScreens = []
     allScreens.forEach(screenId => {
       const element = document.getElementById(screenId)
-      element.classList.remove('fade-out', 'fade-in')
+      element.classList.remove(
+        'fade-out',
+        'fade-in',
+        'magical-exit',
+        'magical-entrance',
+        'sparkle-burst',
+        'active'
+      )
       if (!element.classList.contains('hidden')) {
         visibleScreens.push(screenId)
       }
