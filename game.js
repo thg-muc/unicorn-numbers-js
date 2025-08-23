@@ -272,9 +272,9 @@ class GameController {
       .getElementById('lang-de')
       .addEventListener('click', () => this.selectLanguage('de'))
 
-    // Play button starts the actual game
+    // Entire intro screen starts the actual game (not just the button)
     document
-      .getElementById('play-button')
+      .getElementById('intro-screen')
       .addEventListener('click', () => this.startGame())
   }
 
