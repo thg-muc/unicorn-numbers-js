@@ -45,5 +45,7 @@ pids
 # Optional eslint cache
 .eslintcache
 
-# Personal/local hooks (not shared with team)
+# Project specific ignores
+TODO
 .husky/commit-msg-local
+
