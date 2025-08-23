@@ -385,7 +385,7 @@ class GameController {
     )
     instructionElement.className = instructionElement.className.replace(
       'text-gray-500',
-      'text-green-800'
+      'text-green-700'
     )
 
     // Add subtle pulse animation to indicate ready
@@ -467,7 +467,7 @@ class GameController {
       'presentationScreen.listen'
     )
     instructionElement.className = instructionElement.className.replace(
-      'text-green-800',
+      'text-green-700',
       'text-gray-500'
     )
 
