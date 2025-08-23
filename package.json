@@ -11,7 +11,13 @@
     "format": "npx prettier --write .",
     "prepare": "husky install"
   },
-  "keywords": ["education", "game", "numbers", "children", "web"],
+  "keywords": [
+    "education",
+    "game",
+    "numbers",
+    "children",
+    "web"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
