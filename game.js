@@ -585,18 +585,19 @@ class GameController {
     const shuffledColors = this.gameSession.shuffleArray([...colors])
     const shuffledFonts = this.gameSession.shuffleArray([...fonts])
 
-    // Set grid layout based on number of choices with larger buttons
+    // Set grid layout based on number of choices with responsive spacing
     if (choices.length === 3) {
-      choicesContainer.className = 'grid grid-cols-3 gap-2 max-w-full mx-auto'
+      choicesContainer.className =
+        'grid grid-cols-3 gap-4 md:gap-6 lg:gap-8 max-w-full mx-auto'
     } else if (choices.length === 5) {
       choicesContainer.className =
-        'grid grid-cols-3 md:grid-cols-5 gap-2 max-w-full mx-auto'
+        'grid grid-cols-3 md:grid-cols-5 gap-4 md:gap-6 lg:gap-8 max-w-full mx-auto'
     } else if (choices.length === 7) {
       choicesContainer.className =
-        'grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 max-w-full mx-auto'
+        'grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 md:gap-6 lg:gap-8 max-w-full mx-auto'
     } else {
       choicesContainer.className =
-        'grid grid-cols-2 md:grid-cols-4 gap-2 max-w-full mx-auto'
+        'grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 lg:gap-8 max-w-full mx-auto'
     }
 
     choices.forEach((choice, index) => {
@@ -607,7 +608,7 @@ class GameController {
       const colorClass = shuffledColors[index % shuffledColors.length]
       const fontClass = shuffledFonts[index % shuffledFonts.length]
 
-      button.className = `${colorClass} text-white text-6xl md:text-7xl lg:text-8xl w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${fontClass}`
+      button.className = `${colorClass} text-white text-[min(12vw,4rem)] md:text-6xl lg:text-7xl w-[min(28vw,8rem)] h-[min(28vw,8rem)] md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${fontClass}`
       button.addEventListener('click', () =>
         this.handleChoice(choice, targetNumber)
       )
@@ -627,12 +628,12 @@ class GameController {
 
       if (button.textContent == selectedChoice) {
         if (isCorrect) {
-          button.className = `bg-green-500 hover:bg-green-600 text-white text-6xl md:text-7xl lg:text-8xl w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center success-animation sparkle-effect ${currentFont}`
+          button.className = `bg-green-500 hover:bg-green-600 text-white text-[min(12vw,4rem)] md:text-6xl lg:text-7xl w-[min(28vw,8rem)] h-[min(28vw,8rem)] md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center success-animation sparkle-effect ${currentFont}`
         } else {
-          button.className = `bg-red-500 hover:bg-red-600 text-white text-6xl md:text-7xl lg:text-8xl w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${currentFont}`
+          button.className = `bg-red-500 hover:bg-red-600 text-white text-[min(12vw,4rem)] md:text-6xl lg:text-7xl w-[min(28vw,8rem)] h-[min(28vw,8rem)] md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${currentFont}`
         }
       } else if (button.textContent == targetNumber && !isCorrect) {
-        button.className = `bg-green-300 hover:bg-green-400 text-white text-6xl md:text-7xl lg:text-8xl w-32 h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${currentFont}`
+        button.className = `bg-green-300 hover:bg-green-400 text-white text-[min(12vw,4rem)] md:text-6xl lg:text-7xl w-[min(28vw,8rem)] h-[min(28vw,8rem)] md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${currentFont}`
       }
     })
 
