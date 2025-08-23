@@ -242,10 +242,11 @@ class GameSession {
 
   getUnicornReward() {
     const percentage = this.getScorePercentage()
-    if (percentage >= 80) return '🦄🦄🦄🦄🦄'
-    if (percentage >= 60) return '🦄🦄🦄🦄'
-    if (percentage >= 40) return '🦄🦄🦄'
-    if (percentage >= 20) return '🦄🦄'
+    if (percentage === 0) return ''
+    if (percentage > 80) return '🦄🦄🦄🦄🦄'
+    if (percentage > 60) return '🦄🦄🦄🦄'
+    if (percentage > 40) return '🦄🦄🦄'
+    if (percentage > 20) return '🦄🦄'
     return '🦄'
   }
 }
