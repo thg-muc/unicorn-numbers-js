@@ -385,7 +385,7 @@ class GameController {
     )
     instructionElement.className = instructionElement.className.replace(
       'text-gray-500',
-      'text-green-600'
+      'text-green-800'
     )
 
     // Add subtle pulse animation to indicate ready
@@ -467,7 +467,7 @@ class GameController {
       'presentationScreen.listen'
     )
     instructionElement.className = instructionElement.className.replace(
-      'text-green-600',
+      'text-green-800',
       'text-gray-500'
     )
 
@@ -669,7 +669,7 @@ class GameController {
         // Same round, next repetition - show new choices with fade-in
         this.showNewChoicesWithFadeIn()
       }
-    }, 200) // Wait for fade-out to complete
+    }, 300) // Wait for fade-out to complete
   }
 
   showNewChoicesWithFadeIn() {
@@ -686,39 +686,23 @@ class GameController {
     // Remove fade-in class after animation completes
     setTimeout(() => {
       choicesContainer.classList.remove('fade-in')
-    }, 200)
+    }, 300)
   }
 
   showPresentationScreen() {
-    document.getElementById('start-screen').classList.add('hidden')
-    document.getElementById('intro-screen').classList.add('hidden')
-    document.getElementById('game-screen').classList.add('hidden')
-    document.getElementById('end-screen').classList.add('hidden')
-    document.getElementById('number-presentation').classList.remove('hidden')
+    this.fadeToScreen('number-presentation')
   }
 
   showIntroScreen() {
-    document.getElementById('start-screen').classList.add('hidden')
-    document.getElementById('number-presentation').classList.add('hidden')
-    document.getElementById('game-screen').classList.add('hidden')
-    document.getElementById('end-screen').classList.add('hidden')
-    document.getElementById('intro-screen').classList.remove('hidden')
+    this.fadeToScreen('intro-screen')
   }
 
   showGameScreen() {
-    document.getElementById('start-screen').classList.add('hidden')
-    document.getElementById('intro-screen').classList.add('hidden')
-    document.getElementById('number-presentation').classList.add('hidden')
-    document.getElementById('end-screen').classList.add('hidden')
-    document.getElementById('game-screen').classList.remove('hidden')
+    this.fadeToScreen('game-screen')
   }
 
   showEndScreen() {
-    document.getElementById('start-screen').classList.add('hidden')
-    document.getElementById('intro-screen').classList.add('hidden')
-    document.getElementById('game-screen').classList.add('hidden')
-    document.getElementById('number-presentation').classList.add('hidden')
-    document.getElementById('end-screen').classList.remove('hidden')
+    this.fadeToScreen('end-screen')
 
     // Display results
     const scorePercentage = this.gameSession.getScorePercentage()
@@ -733,6 +717,83 @@ class GameController {
     )
 
     document.getElementById('unicorn-reward').textContent = unicornReward
+  }
+
+  fadeToScreen(targetScreenId) {
+    const allScreens = [
+      'start-screen',
+      'intro-screen',
+      'number-presentation',
+      'game-screen',
+      'end-screen',
+    ]
+
+    // Cancel any pending transition timeouts
+    if (this.transitionTimeout) {
+      clearTimeout(this.transitionTimeout)
+      this.transitionTimeout = null
+    }
+    if (this.cleanupTimeout) {
+      clearTimeout(this.cleanupTimeout)
+      this.cleanupTimeout = null
+    }
+
+    // Clean up all animation classes and find visible screens
+    const visibleScreens = []
+    allScreens.forEach(screenId => {
+      const element = document.getElementById(screenId)
+      element.classList.remove('fade-out', 'fade-in')
+      if (!element.classList.contains('hidden')) {
+        visibleScreens.push(screenId)
+      }
+    })
+
+    // Immediately hide all screens except target to prevent stacking
+    allScreens.forEach(screenId => {
+      if (screenId !== targetScreenId) {
+        document.getElementById(screenId).classList.add('hidden')
+      }
+    })
+
+    // If we have a visible screen that's not the target, do smooth transition
+    const currentScreen = visibleScreens.find(
+      screenId => screenId !== targetScreenId
+    )
+
+    if (currentScreen) {
+      // Re-show the current screen temporarily for smooth fade-out
+      const currentElement = document.getElementById(currentScreen)
+      currentElement.classList.remove('hidden')
+      currentElement.classList.add('fade-out')
+
+      // After fade-out completes, show and fade in target
+      this.transitionTimeout = setTimeout(() => {
+        currentElement.classList.add('hidden')
+        currentElement.classList.remove('fade-out')
+
+        const targetElement = document.getElementById(targetScreenId)
+        targetElement.classList.remove('hidden')
+        targetElement.classList.add('fade-in')
+
+        // Clean up fade-in class after animation
+        this.cleanupTimeout = setTimeout(() => {
+          targetElement.classList.remove('fade-in')
+          this.cleanupTimeout = null
+        }, 300)
+
+        this.transitionTimeout = null
+      }, 300)
+    } else {
+      // No transition needed, just show target screen with fade-in
+      const targetElement = document.getElementById(targetScreenId)
+      targetElement.classList.remove('hidden')
+      targetElement.classList.add('fade-in')
+
+      this.cleanupTimeout = setTimeout(() => {
+        targetElement.classList.remove('fade-in')
+        this.cleanupTimeout = null
+      }, 300)
+    }
   }
 }
 
