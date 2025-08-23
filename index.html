@@ -266,6 +266,61 @@
           url('assets/images/background.jpg') center/cover fixed no-repeat,
           linear-gradient(to bottom right, #f3f4f6, #d1d5db);
       }
+
+      /* Glowing title effects for visibility on background */
+      .title-glow {
+        text-shadow:
+          0 0 10px rgba(147, 51, 234, 0.8),
+          0 0 20px rgba(147, 51, 234, 0.6),
+          0 0 30px rgba(147, 51, 234, 0.4),
+          0 0 40px rgba(255, 255, 255, 0.8),
+          0 4px 8px rgba(0, 0, 0, 0.3);
+        animation: titlePulse 3s ease-in-out infinite;
+      }
+
+      @keyframes titlePulse {
+        0%,
+        100% {
+          text-shadow:
+            0 0 10px rgba(147, 51, 234, 0.8),
+            0 0 20px rgba(147, 51, 234, 0.6),
+            0 0 30px rgba(147, 51, 234, 0.4),
+            0 0 40px rgba(255, 255, 255, 0.8),
+            0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        50% {
+          text-shadow:
+            0 0 15px rgba(147, 51, 234, 1),
+            0 0 30px rgba(147, 51, 234, 0.8),
+            0 0 45px rgba(147, 51, 234, 0.6),
+            0 0 60px rgba(255, 255, 255, 1),
+            0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+      }
+
+      /* Subtle scale pulse animation */
+      .title-pulse {
+        animation: titleScalePulse 4s ease-in-out infinite;
+      }
+
+      @keyframes titleScalePulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.02);
+        }
+      }
+
+      /* Semi-transparent button backdrop */
+      .button-backdrop {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      }
     </style>
   </head>
   <body class="min-h-screen flex items-center justify-center font-bold">
@@ -275,10 +330,10 @@
       <!-- Start Screen -->
       <div
         id="start-screen"
-        class="text-center bg-white rounded-lg shadow-lg p-6 md:p-8 w-full max-w-md md:max-w-2xl"
+        class="text-center w-full max-w-md md:max-w-4xl px-6 py-8"
       >
         <h1
-          class="text-5xl md:text-6xl text-purple-600 mb-8 md:mb-10"
+          class="text-7xl md:text-8xl text-purple-600 mb-8 md:mb-10 title-glow title-pulse font-black"
           data-i18n="startScreen.title"
         >
           🦄 Unicorn Numbers
@@ -289,13 +344,13 @@
         >
           <button
             id="lang-en"
-            class="bg-blue-500 hover:bg-blue-600 text-white text-3xl md:text-4xl px-10 py-6 md:px-8 md:py-4 rounded-lg tap-target transition-colors flex-1 md:flex-none md:min-w-[180px]"
+            class="bg-blue-500 hover:bg-blue-600 text-white text-3xl md:text-4xl px-10 py-6 md:px-8 md:py-4 rounded-lg tap-target transition-all duration-300 flex-1 md:flex-none md:min-w-[180px] button-backdrop shadow-lg hover:shadow-xl"
           >
             🇬🇧 English
           </button>
           <button
             id="lang-de"
-            class="bg-green-500 hover:bg-green-600 text-white text-3xl md:text-4xl px-10 py-6 md:px-8 md:py-4 rounded-lg tap-target transition-colors flex-1 md:flex-none md:min-w-[180px]"
+            class="bg-green-500 hover:bg-green-600 text-white text-3xl md:text-4xl px-10 py-6 md:px-8 md:py-4 rounded-lg tap-target transition-all duration-300 flex-1 md:flex-none md:min-w-[180px] button-backdrop shadow-lg hover:shadow-xl"
           >
             🇩🇪 Deutsch
           </button>
