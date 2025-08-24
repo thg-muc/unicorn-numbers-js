@@ -655,11 +655,122 @@
           0 2px 8px rgba(0, 0, 0, 0.1),
           inset 0 1px 0 rgba(255, 255, 255, 0.3);
       }
+
+      /* Floating Particle System */
+      .floating-particle {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        will-change: transform, opacity;
+        animation: floatUp var(--duration, 20s) linear infinite;
+        animation-delay: var(--delay, 0s);
+        opacity: var(--opacity, 0.3);
+        width: var(--size, 4px);
+        height: var(--size, 4px);
+        background: var(--color, rgba(255, 255, 255, 0.8));
+        box-shadow:
+          0 0 var(--glow-size, 6px) var(--glow-color, rgba(255, 255, 255, 0.5)),
+          inset 0 0 var(--inner-glow, 2px) rgba(255, 255, 255, 0.3);
+      }
+
+      .floating-particle.stardust {
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 1) 0%,
+          rgba(255, 215, 0, 0.8) 70%,
+          transparent 100%
+        );
+        box-shadow:
+          0 0 12px rgba(255, 215, 0, 0.8),
+          0 0 24px rgba(255, 255, 255, 0.6);
+      }
+
+      .floating-particle.sparkle {
+        background: radial-gradient(
+          circle,
+          rgba(255, 192, 203, 1) 0%,
+          rgba(173, 216, 230, 0.8) 100%
+        );
+        box-shadow:
+          0 0 12px rgba(255, 192, 203, 0.8),
+          0 0 24px rgba(173, 216, 230, 0.6);
+      }
+
+      .floating-particle.twinkle {
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 1) 0%,
+          rgba(147, 51, 234, 0.8) 100%
+        );
+        animation:
+          floatUp var(--duration, 25s) linear infinite,
+          twinkleEffect 2s ease-in-out infinite;
+        animation-delay: var(--delay, 0s), calc(var(--delay, 0s) + 1s);
+        box-shadow:
+          0 0 16px rgba(147, 51, 234, 0.9),
+          0 0 32px rgba(255, 255, 255, 0.7);
+      }
+
+      @keyframes floatUp {
+        0% {
+          transform: translateY(0) translateX(0) scale(0);
+          opacity: 0;
+        }
+        5% {
+          opacity: var(--opacity, 0.6);
+          transform: translateY(-50px) translateX(0) scale(1);
+        }
+        25% {
+          transform: translateY(-25vh) translateX(var(--drift-x1, 15px))
+            scale(1);
+        }
+        50% {
+          transform: translateY(-50vh) translateX(var(--drift-x2, -10px))
+            scale(1);
+        }
+        75% {
+          transform: translateY(-75vh) translateX(var(--drift-x3, 20px))
+            scale(1);
+        }
+        95% {
+          opacity: var(--opacity, 0.6);
+          transform: translateY(-100vh) translateX(var(--drift-x4, -5px))
+            scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(calc(-100vh - 50px))
+            translateX(var(--drift-x4, -5px)) scale(0);
+        }
+      }
+
+      @keyframes twinkleEffect {
+        0%,
+        100% {
+          box-shadow:
+            0 0 var(--glow-size, 6px)
+              var(--glow-color, rgba(255, 255, 255, 0.5)),
+            inset 0 0 var(--inner-glow, 2px) rgba(255, 255, 255, 0.3);
+        }
+        50% {
+          box-shadow:
+            0 0 calc(var(--glow-size, 6px) * 1.5)
+              var(--glow-color, rgba(255, 255, 255, 0.8)),
+            inset 0 0 calc(var(--inner-glow, 2px) * 1.5)
+              rgba(255, 255, 255, 0.6);
+        }
+      }
     </style>
   </head>
   <body class="min-h-screen flex items-center justify-center font-bold">
+    <!-- Floating Particles Container -->
     <div
-      class="container mx-auto p-2 md:p-4 max-w-full md:max-w-4xl flex items-center justify-center"
+      id="particles-container"
+      class="fixed inset-0 pointer-events-none z-0"
+    ></div>
+
+    <div
+      class="container mx-auto p-2 md:p-4 max-w-full md:max-w-4xl flex items-center justify-center relative z-10"
     >
       <!-- Start Screen -->
       <div

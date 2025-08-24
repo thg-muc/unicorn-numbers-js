@@ -1055,8 +1055,152 @@ class GameController {
   }
 }
 
+// Floating Particle System
+class ParticleSystem {
+  constructor() {
+    this.particleContainer = document.getElementById('particles-container')
+    this.particleTypes = ['stardust', 'sparkle', 'twinkle']
+    this.colors = [
+      'rgba(255, 255, 255, 0.8)', // White
+      'rgba(255, 215, 0, 0.7)', // Gold
+      'rgba(255, 192, 203, 0.6)', // Pink
+      'rgba(173, 216, 230, 0.6)', // Light Blue
+      'rgba(147, 51, 234, 0.5)', // Purple
+    ]
+    this.maxParticles = 12
+    this.particles = []
+    this.isActive = true
+
+    this.init()
+  }
+
+  init() {
+    // Create initial particles with random timing to avoid clustering
+    for (let i = 0; i < this.maxParticles; i++) {
+      const randomDelay = this.randomBetween(0, 30000) // Spread across 30 seconds
+      setTimeout(() => {
+        if (this.isActive) {
+          this.createParticle()
+        }
+      }, randomDelay)
+    }
+  }
+
+  createParticle() {
+    if (!this.isActive) return
+
+    const particle = document.createElement('div')
+    particle.className = `floating-particle ${this.getRandomType()}`
+
+    // Random properties - more visible
+    const size = this.randomBetween(6, 12)
+    const opacity = this.randomBetween(0.6, 0.9)
+    const duration = this.randomBetween(25, 35)
+    const delay = this.randomBetween(0, 5)
+    const startX = this.randomBetween(
+      window.innerWidth * 0.2,
+      window.innerWidth * 0.8
+    )
+
+    // Natural drift values - 10% of screen width for S-curve movement
+    const driftX1 = this.randomBetween(
+      -window.innerWidth * 0.1,
+      window.innerWidth * 0.1
+    )
+    const driftX2 = this.randomBetween(
+      -window.innerWidth * 0.08,
+      window.innerWidth * 0.08
+    )
+    const driftX3 = this.randomBetween(
+      -window.innerWidth * 0.1,
+      window.innerWidth * 0.1
+    )
+    const driftX4 = this.randomBetween(
+      -window.innerWidth * 0.05,
+      window.innerWidth * 0.05
+    )
+
+    // Glow properties
+    const glowSize = this.randomBetween(4, 8)
+    const innerGlow = this.randomBetween(1, 3)
+
+    // Set CSS custom properties
+    particle.style.setProperty('--size', `${size}px`)
+    particle.style.setProperty('--opacity', opacity)
+    particle.style.setProperty('--duration', `${duration}s`)
+    particle.style.setProperty('--delay', `${delay}s`)
+    particle.style.setProperty('--start-x', `${startX}px`)
+    particle.style.setProperty('--drift-x1', `${driftX1}px`)
+    particle.style.setProperty('--drift-x2', `${driftX2}px`)
+    particle.style.setProperty('--drift-x3', `${driftX3}px`)
+    particle.style.setProperty('--drift-x4', `${driftX4}px`)
+    particle.style.setProperty('--glow-size', `${glowSize}px`)
+    particle.style.setProperty('--inner-glow', `${innerGlow}px`)
+
+    // Position the particle
+    particle.style.left = `${startX}px`
+    particle.style.top = `${window.innerHeight + 20}px`
+
+    this.particleContainer.appendChild(particle)
+    this.particles.push(particle)
+
+    // Schedule particle removal and replacement
+    setTimeout(
+      () => {
+        this.removeParticle(particle)
+        // Create a new particle to maintain count
+        if (this.isActive) {
+          setTimeout(
+            () => this.createParticle(),
+            this.randomBetween(5000, 15000)
+          )
+        }
+      },
+      (duration + delay) * 1000
+    )
+  }
+
+  removeParticle(particle) {
+    const index = this.particles.indexOf(particle)
+    if (index > -1) {
+      this.particles.splice(index, 1)
+    }
+    if (particle.parentNode) {
+      particle.parentNode.removeChild(particle)
+    }
+  }
+
+  getRandomType() {
+    return this.particleTypes[
+      Math.floor(Math.random() * this.particleTypes.length)
+    ]
+  }
+
+  randomBetween(min, max) {
+    return Math.random() * (max - min) + min
+  }
+
+  // Control particle system
+  pause() {
+    this.isActive = false
+  }
+
+  resume() {
+    this.isActive = true
+    this.init()
+  }
+
+  destroy() {
+    this.isActive = false
+    this.particles.forEach(particle => this.removeParticle(particle))
+    this.particles = []
+  }
+}
+
 // Initialize the game when the page loads
 let gameController
+let particleSystem
 document.addEventListener('DOMContentLoaded', () => {
   gameController = new GameController()
+  particleSystem = new ParticleSystem()
 })
