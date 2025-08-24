@@ -175,6 +175,63 @@ class AudioManager {
   }
 }
 
+// Sound Effects Manager for UI sounds
+class SoundEffects {
+  constructor() {
+    this.effects = {}
+    this.loadEffects()
+  }
+
+  loadEffects() {
+    const effectNames = [
+      'correct-answer',
+      'wrong-answer',
+      'transition',
+      'game-complete',
+    ]
+
+    effectNames.forEach(name => {
+      this.effects[name] = new Audio(`assets/audio/effects/${name}.mp3`)
+      this.effects[name].preload = 'auto'
+
+      // Handle loading errors gracefully
+      this.effects[name].onerror = () => {
+        console.warn(`Could not load sound effect: ${name}.mp3`)
+      }
+    })
+  }
+
+  play(effectName) {
+    if (this.effects[effectName]) {
+      try {
+        // Clone audio for overlapping sounds (important for rapid clicks)
+        const audio = this.effects[effectName].cloneNode()
+        audio.play().catch(error => {
+          console.warn(`Could not play sound effect: ${effectName}`, error)
+        })
+      } catch (error) {
+        console.warn(`Error playing sound effect: ${effectName}`, error)
+      }
+    }
+  }
+
+  playCorrectAnswer() {
+    this.play('correct-answer')
+  }
+
+  playWrongAnswer() {
+    this.play('wrong-answer')
+  }
+
+  playTransition() {
+    this.play('transition')
+  }
+
+  playGameComplete() {
+    this.play('game-complete')
+  }
+}
+
 // Game state management
 class GameSession {
   constructor() {
@@ -256,6 +313,7 @@ class GameController {
   constructor() {
     this.gameSession = null
     this.audioManager = new AudioManager()
+    this.soundEffects = new SoundEffects()
     this.initializeEventListeners()
   }
 
@@ -293,6 +351,9 @@ class GameController {
   }
 
   startGame() {
+    // Play transition sound
+    this.soundEffects.playTransition()
+
     // Stop intro audio to prevent overlap
     this.audioManager.stopIntroAudio()
 
@@ -631,6 +692,13 @@ class GameController {
     const isCorrect = selectedChoice === targetNumber
     this.gameSession.recordSelection(isCorrect)
 
+    // Play correct or wrong answer sound
+    if (isCorrect) {
+      this.soundEffects.playCorrectAnswer()
+    } else {
+      this.soundEffects.playWrongAnswer()
+    }
+
     // Visual feedback
     const buttons = document.querySelectorAll('#choices button')
     buttons.forEach(button => {
@@ -875,6 +943,11 @@ class GameController {
 
     // Display results immediately
     this.displayEndScreenResults()
+
+    // Play celebration sound after a short delay
+    setTimeout(() => {
+      this.soundEffects.playGameComplete()
+    }, 500)
 
     setTimeout(() => {
       screen.classList.remove('magical-entrance')
