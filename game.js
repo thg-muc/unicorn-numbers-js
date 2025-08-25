@@ -25,9 +25,19 @@ const translations = {
     },
     endScreen: {
       greatJob: 'Great Job!',
-      playAgain: 'Play Again',
+      collectUnicorns: 'Collect Unicorns!',
+      startGame: 'Start Game',
       scoreText: (count, percentage) =>
-        `You earned ${count} unicorns! (${percentage}%)`,
+        `You earned ${count} stars! (${percentage}%)`,
+    },
+    rewardsScreen: {
+      title: '🦄 Collection',
+      chooseUnicorn: (unlocked, total) =>
+        `Tap to unlock (${unlocked}/${total} collected)`,
+      chooseStarterUnicorn: 'Choose your starter unicorn!',
+      allUnlocked: 'Amazing! You collected all unicorns!',
+      startGame: 'Start Game',
+      tapToView: 'Tap to view',
     },
   },
   de: {
@@ -55,9 +65,19 @@ const translations = {
     },
     endScreen: {
       greatJob: 'Gut gemacht!',
-      playAgain: 'Nochmal spielen',
+      collectUnicorns: 'Einhörner sammeln!',
+      startGame: 'Spiel starten',
       scoreText: (count, percentage) =>
-        `Du hast ${count} Einhörner verdient! (${percentage}%)`,
+        `Du hast ${count} Sterne verdient! (${percentage}%)`,
+    },
+    rewardsScreen: {
+      title: '🦄 Sammlung',
+      chooseUnicorn: (unlocked, total) =>
+        `Tippen zum Freischalten (${unlocked}/${total} gesammelt)`,
+      chooseStarterUnicorn: 'Wähle dein Starter-Einhorn!',
+      allUnlocked: 'Fantastisch! Du hast alle Einhörner gesammelt!',
+      startGame: 'Spiel starten',
+      tapToView: 'Tippen zum Anzeigen',
     },
   },
 }
@@ -173,6 +193,20 @@ class AudioManager {
       this.introAudio = null
     }
   }
+
+  playUnicornsAudio() {
+    // Play unicorns audio for rewards screen
+    const audioPath = `assets/audio/${this.language}/unicorns.mp3`
+    this.introAudio = new Audio(audioPath)
+
+    this.introAudio.onerror = () => {
+      console.warn(`Could not load unicorns audio: ${audioPath}`)
+    }
+
+    this.introAudio.play().catch(error => {
+      console.warn('Could not play unicorns audio:', error)
+    })
+  }
 }
 
 // Sound Effects Manager for UI sounds
@@ -230,6 +264,122 @@ class SoundEffects {
   playGameComplete() {
     this.play('game-complete')
   }
+
+  playRewardUnlock() {
+    // Use game complete sound for reward unlock
+    this.play('game-complete')
+  }
+}
+
+// Rewards system for unicorn collection
+class RewardsManager {
+  constructor() {
+    this.unicornData = []
+    this.unlockedIds = new Set()
+    this.loadProgress()
+    this.initializeUnicorns()
+    console.log(`Loaded ${this.unicornData.length} unicorn images`)
+  }
+
+  initializeUnicorns() {
+    // Simple list of actual unicorn files (no HTTP requests needed!)
+    const unicornFiles = [
+      '01_luna.jpg',
+      '02_stella.jpg',
+      '03_aurora.jpg',
+      '04_nova.jpg',
+      '05_ginger.jpg',
+      '06_sunny.jpg',
+      '07_pixie.jpg',
+      '08_rainbow.jpg',
+      '09_snowflake.jpg',
+      '10_starlight.jpg',
+      '11_donna.jpg',
+      '12_sparkle.jpg',
+      '13_dreamy.jpg',
+      '14_magic.jpg',
+      '15_elsa.jpg',
+    ]
+
+    this.unicornData = unicornFiles.map(filename => {
+      const parts = filename.split('_')
+      const id = parseInt(parts[0])
+      const nameWithExt = parts[1]
+      const name = nameWithExt.split('.')[0]
+
+      return {
+        id,
+        name: name.charAt(0).toUpperCase() + name.slice(1),
+        filename,
+        path: `assets/rewards/${filename}`,
+        isUnlocked: this.unlockedIds.has(id),
+      }
+    })
+  }
+
+  loadProgress() {
+    try {
+      const saved = localStorage.getItem('unicornRewards')
+      if (saved) {
+        const progress = JSON.parse(saved)
+        this.unlockedIds = new Set(progress.unlockedIds || [])
+      }
+    } catch (error) {
+      console.warn('Could not load rewards progress:', error)
+      this.unlockedIds = new Set()
+    }
+  }
+
+  saveProgress() {
+    try {
+      const progress = {
+        unlockedIds: Array.from(this.unlockedIds),
+        totalUnlocked: this.unlockedIds.size,
+        lastUnlock: new Date().toISOString(),
+      }
+      localStorage.setItem('unicornRewards', JSON.stringify(progress))
+    } catch (error) {
+      console.warn('Could not save rewards progress:', error)
+    }
+  }
+
+  getRandomLockedUnicorn() {
+    const locked = this.unicornData.filter(unicorn => !unicorn.isUnlocked)
+    if (locked.length === 0) return null
+
+    const randomIndex = Math.floor(Math.random() * locked.length)
+    return locked[randomIndex]
+  }
+
+  unlockUnicorn(id) {
+    this.unlockedIds.add(id)
+    const unicorn = this.unicornData.find(u => u.id === id)
+    if (unicorn) {
+      unicorn.isUnlocked = true
+    }
+    this.saveProgress()
+    return unicorn
+  }
+
+  getAllUnicorns() {
+    return this.unicornData
+  }
+
+  getUnlockedCount() {
+    return this.unlockedIds.size
+  }
+
+  getTotalCount() {
+    return this.unicornData.length
+  }
+
+  isAllUnlocked() {
+    return this.unlockedIds.size >= this.unicornData.length
+  }
+
+  canUnlockMore() {
+    return this.unlockedIds.size < this.unicornData.length
+  }
 }
 
 // Game state management
@@ -237,7 +387,7 @@ class GameSession {
   constructor() {
     this.currentRound = 0
     this.difficulty = 'Easy'
-    this.totalRounds = this.difficulty === 'Easy' ? 5 : 10
+    this.totalRounds = this.difficulty === 'Easy' ? 2 : 10
     this.repetitionsPerRound = 3
     this.currentRepetition = 0
     this.score = 0
@@ -300,11 +450,11 @@ class GameSession {
   getUnicornReward() {
     const percentage = this.getScorePercentage()
     if (percentage === 0) return ''
-    if (percentage > 80) return '🦄🦄🦄🦄🦄'
-    if (percentage > 60) return '🦄🦄🦄🦄'
-    if (percentage > 40) return '🦄🦄🦄'
-    if (percentage > 20) return '🦄🦄'
-    return '🦄'
+    if (percentage > 80) return '⭐⭐⭐⭐⭐'
+    if (percentage > 60) return '⭐⭐⭐⭐'
+    if (percentage > 40) return '⭐⭐⭐'
+    if (percentage > 20) return '⭐⭐'
+    return '⭐'
   }
 }
 
@@ -314,13 +464,14 @@ class GameController {
     this.gameSession = null
     this.audioManager = new AudioManager()
     this.soundEffects = new SoundEffects()
+    this.rewardsManager = new RewardsManager()
     this.initializeEventListeners()
   }
 
   initializeEventListeners() {
     document
       .getElementById('restart-button')
-      .addEventListener('click', () => this.startGame())
+      .addEventListener('click', () => this.handleSeeUnicornsClick())
 
     // Language selection plays audio and shows intro screen
     document
@@ -334,6 +485,28 @@ class GameController {
     document
       .getElementById('intro-screen')
       .addEventListener('click', () => this.startGame())
+
+    // Rewards screen continue button
+    document
+      .getElementById('rewards-continue-button')
+      .addEventListener('click', () => this.continueFromRewards())
+
+    // Modal close on click
+    document.getElementById('unicorn-modal').addEventListener('click', e => {
+      if (e.target === e.currentTarget) {
+        this.closeUnicornModal()
+      }
+    })
+
+    // Modal close on Escape key
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        const modal = document.getElementById('unicorn-modal')
+        if (modal.classList.contains('active')) {
+          this.closeUnicornModal()
+        }
+      }
+    })
   }
 
   startGameWithLanguage(language) {
@@ -341,13 +514,32 @@ class GameController {
     this.startGame()
   }
 
-  selectLanguage(language) {
-    // Set language and play intro audio
-    this.audioManager.setLanguage(language)
-    this.audioManager.playIntroAudio()
+  handleSeeUnicornsClick() {
+    // Check if player earned any unicorns this game
+    const unicornCount = [...this.gameSession.getUnicornReward()].length
 
-    // Show intro screen
-    this.showIntroScreen()
+    if (unicornCount > 0 && this.rewardsManager.canUnlockMore()) {
+      // Player earned unicorns and can unlock more - show rewards screen
+      this.showRewardsScreen()
+    } else {
+      // No unicorns earned or all unlocked - start new game
+      this.startGame()
+    }
+  }
+
+  selectLanguage(language) {
+    // Set language
+    this.audioManager.setLanguage(language)
+
+    // Check if player has no unicorns - offer starter unicorn
+    if (this.rewardsManager.getUnlockedCount() === 0) {
+      // First time player - show rewards screen for starter unicorn
+      this.isStarterUnicornMode = true
+      this.showRewardsScreen()
+    } else {
+      // Existing player - show intro screen
+      this.showIntroScreen()
+    }
   }
 
   startGame() {
@@ -774,6 +966,8 @@ class GameController {
 
   showIntroScreen() {
     this.fadeToScreen('intro-screen')
+    // Play intro audio when showing intro screen
+    this.audioManager.playIntroAudio()
   }
 
   showGameScreen() {
@@ -968,6 +1162,22 @@ class GameController {
     )
 
     document.getElementById('unicorn-reward').textContent = unicornReward
+
+    // Update button based on stars earned
+    const button = document.getElementById('restart-button')
+    if (unicornCount === 0) {
+      // 0 stars - show "Start Game" with purple styling
+      button.textContent = this.audioManager.getTranslation(
+        'endScreen.startGame'
+      )
+      button.className = 'btn-primary btn-size-normal btn-responsive'
+    } else {
+      // 1+ stars - show "Collect Unicorns!" with yellow styling
+      button.textContent = this.audioManager.getTranslation(
+        'endScreen.collectUnicorns'
+      )
+      button.className = 'btn-secondary btn-size-normal btn-responsive'
+    }
   }
 
   fadeToScreen(targetScreenId) {
@@ -977,6 +1187,7 @@ class GameController {
       'number-presentation',
       'game-screen',
       'end-screen',
+      'rewards-screen',
     ]
 
     // Cancel any pending transition timeouts
@@ -1052,6 +1263,259 @@ class GameController {
         this.cleanupTimeout = null
       }, 300)
     }
+  }
+
+  // Rewards System Methods
+  showRewardsScreen() {
+    this.fadeToScreen('rewards-screen')
+    this.setupRewardsScreen()
+  }
+
+  setupRewardsScreen() {
+    // Reset session unlock flag
+    this.hasUnlockedThisSession = false
+
+    const instructionElement = document.getElementById('rewards-instruction')
+
+    // Update combined text
+    if (this.isStarterUnicornMode) {
+      // Show starter unicorn instruction
+      instructionElement.textContent = this.audioManager.getTranslation(
+        'rewardsScreen.chooseStarterUnicorn'
+      )
+    } else if (this.rewardsManager.isAllUnlocked()) {
+      instructionElement.textContent = this.audioManager.getTranslation(
+        'rewardsScreen.allUnlocked'
+      )
+    } else {
+      const combinedText = this.audioManager.getTranslation(
+        'rewardsScreen.chooseUnicorn'
+      )
+      instructionElement.textContent = combinedText(
+        this.rewardsManager.getUnlockedCount(),
+        this.rewardsManager.getTotalCount()
+      )
+    }
+
+    // Generate unicorn grid
+    this.generateUnicornGrid()
+
+    // Update button text and hide initially
+    this.audioManager.updateUILanguage()
+    const button = document.getElementById('rewards-continue-button')
+    button.classList.add('opacity-0', 'pointer-events-none')
+
+    // Play unicorns audio
+    this.audioManager.playUnicornsAudio()
+  }
+
+  generateUnicornGrid() {
+    const gridElement = document.getElementById('unicorn-grid')
+    gridElement.innerHTML = ''
+
+    this.rewardsManager.getAllUnicorns().forEach(unicorn => {
+      const cardElement = this.createUnicornCard(unicorn)
+      gridElement.appendChild(cardElement)
+    })
+  }
+
+  createUnicornCard(unicorn) {
+    const cardContainer = document.createElement('div')
+    cardContainer.className = 'unicorn-card'
+    cardContainer.dataset.unicornId = unicorn.id
+
+    const cardFront = document.createElement('div')
+    cardFront.className = 'card-front'
+
+    const cardBack = document.createElement('div')
+    cardBack.className = 'card-back'
+
+    if (unicorn.isUnlocked) {
+      // Show unlocked unicorn
+      cardFront.className += ' unlocked-card'
+      cardFront.innerHTML = `<img src="${unicorn.path}" alt="${unicorn.name}" onerror="this.style.display='none'"/>`
+
+      const nameLabel = document.createElement('div')
+      nameLabel.className = 'card-name card-name-visible'
+      nameLabel.textContent = unicorn.name
+      cardContainer.appendChild(nameLabel)
+
+      // Add click handler to view full size
+      cardContainer.addEventListener('click', () =>
+        this.openUnicornModal(unicorn)
+      )
+    } else {
+      // Show mystery card
+      cardFront.className += ' mystery-card'
+      cardFront.innerHTML = '<div class="mystery-icon">❓</div>'
+
+      // Add click handler to unlock if game allows it
+      if (this.canUnlockUnicorn()) {
+        cardContainer.addEventListener('click', () =>
+          this.unlockUnicorn(unicorn.id, cardContainer)
+        )
+      }
+    }
+
+    cardContainer.appendChild(cardFront)
+    cardContainer.appendChild(cardBack)
+
+    return cardContainer
+  }
+
+  canUnlockUnicorn() {
+    // Can unlock if:
+    // 1. Player earned unicorns this game OR is in starter mode
+    // 2. There are locked unicorns available
+    // 3. Hasn't unlocked this session yet
+    const unicornCount = this.gameSession
+      ? [...this.gameSession.getUnicornReward()].length
+      : 0
+    const earnedUnicorns = unicornCount > 0
+    const isStarterMode = this.isStarterUnicornMode
+
+    return (
+      (earnedUnicorns || isStarterMode) &&
+      this.rewardsManager.canUnlockMore() &&
+      !this.hasUnlockedThisSession
+    )
+  }
+
+  unlockUnicorn(unicornId, cardElement) {
+    if (!this.canUnlockUnicorn()) return
+
+    // Play celebration sound
+    this.soundEffects.playRewardUnlock()
+
+    // Mark as unlocked this session and show button
+    this.hasUnlockedThisSession = true
+    const button = document.getElementById('rewards-continue-button')
+    button.classList.remove('opacity-0', 'pointer-events-none')
+    button.classList.add('opacity-100', 'pointer-events-auto')
+
+    // Add flip animation
+    cardElement.classList.add('flipping')
+
+    // After flip animation, update card content
+    setTimeout(() => {
+      const unicorn = this.rewardsManager.unlockUnicorn(unicornId)
+      if (unicorn) {
+        this.updateCardToUnlocked(cardElement, unicorn)
+        this.showUnlockCelebration(cardElement)
+      }
+    }, 400) // Half of flip duration
+
+    // Update instruction text if all unlocked
+    setTimeout(() => {
+      if (this.rewardsManager.isAllUnlocked()) {
+        const instructionElement = document.getElementById(
+          'rewards-instruction'
+        )
+        instructionElement.textContent = this.audioManager.getTranslation(
+          'rewardsScreen.allUnlocked'
+        )
+      }
+      this.updateProgressDisplay()
+    }, 1000)
+  }
+
+  updateCardToUnlocked(cardElement, unicorn) {
+    const cardFront = cardElement.querySelector('.card-front')
+    const cardBack = cardElement.querySelector('.card-back')
+
+    // Update back face with unicorn image
+    cardBack.className = 'card-back unlocked-card'
+    cardBack.innerHTML = `<img src="${unicorn.path}" alt="${unicorn.name}" onerror="this.style.display='none'"/>`
+
+    // After flip animation completes, reset card and show on front
+    setTimeout(() => {
+      // Remove flipping class and reset transform
+      cardElement.classList.remove('flipping')
+      cardElement.style.transform = 'rotateY(0deg)'
+
+      // Update front face with unicorn content
+      cardFront.className = 'card-front unlocked-card'
+      cardFront.innerHTML = `<img src="${unicorn.path}" alt="${unicorn.name}" onerror="this.style.display='none'"/>`
+
+      // Add name label (will now be positioned correctly)
+      const nameLabel = document.createElement('div')
+      nameLabel.className = 'card-name'
+      nameLabel.textContent = unicorn.name
+      cardElement.appendChild(nameLabel)
+
+      // Clear any existing click handlers and add new one
+      const newCardElement = cardElement.cloneNode(true)
+      newCardElement.addEventListener('click', () =>
+        this.openUnicornModal(unicorn)
+      )
+      cardElement.parentNode.replaceChild(newCardElement, cardElement)
+    }, 400) // Wait for flip animation to complete
+  }
+
+  showUnlockCelebration(cardElement) {
+    const celebration = document.createElement('div')
+    celebration.className = 'unlock-celebration'
+    cardElement.appendChild(celebration)
+
+    setTimeout(() => {
+      if (celebration.parentNode) {
+        celebration.parentNode.removeChild(celebration)
+      }
+    }, 2000)
+  }
+
+  updateProgressDisplay() {
+    const progressElement = document.getElementById('collection-progress')
+    const progressText = this.audioManager.getTranslation(
+      'rewardsScreen.progress'
+    )
+    progressElement.textContent = progressText(
+      this.rewardsManager.getUnlockedCount(),
+      this.rewardsManager.getTotalCount()
+    )
+  }
+
+  openUnicornModal(unicorn) {
+    const modal = document.getElementById('unicorn-modal')
+    const image = document.getElementById('modal-unicorn-image')
+    const name = document.getElementById('modal-unicorn-name')
+
+    image.src = unicorn.path
+    image.alt = unicorn.name
+    name.textContent = unicorn.name
+
+    modal.classList.add('active')
+  }
+
+  closeUnicornModal() {
+    const modal = document.getElementById('unicorn-modal')
+    modal.classList.remove('active')
+  }
+
+  continueFromRewards() {
+    // Handle starter mode completion
+    if (this.isStarterUnicornMode) {
+      // Coming from starter unicorn selection - go to intro screen
+      this.isStarterUnicornMode = false
+      this.showIntroScreen()
+      return
+    }
+
+    // Regular mode - check if language is already set in localStorage
+    const savedLanguage = localStorage.getItem('preferredLanguage')
+    if (savedLanguage) {
+      // Language already set, skip to intro screen
+      this.audioManager.setLanguage(savedLanguage)
+      this.fadeToScreen('intro-screen')
+    } else {
+      // No language set, show start screen with language selection
+      this.fadeToScreen('start-screen')
+      this.showStartScreen()
+    }
+  }
+
+  showStartScreen() {
+    // Reset for new game
   }
 }
 
