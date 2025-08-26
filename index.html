@@ -654,6 +654,20 @@
           0 8px 32px rgba(0, 0, 0, 0.16),
           0 2px 8px rgba(0, 0, 0, 0.1),
           inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      @media (orientation: landscape) and (max-height: 600px) {
+        .glass-frame {
+          max-height: 95vh;
+        }
+      }
+
+      @media (orientation: landscape) and (max-height: 500px) {
+        .glass-frame {
+          max-height: 98vh;
+        }
       }
 
       /* Floating Particle System */
@@ -771,25 +785,51 @@
       @media (orientation: portrait) {
         .rewards-grid {
           grid-template-columns: repeat(3, 1fr);
+          max-width: 280px;
+          margin: 0 auto;
         }
       }
 
       @media (orientation: landscape) {
         .rewards-grid {
           grid-template-columns: repeat(5, 1fr);
+          max-width: 350px;
+          margin: 0 auto;
+        }
+      }
+
+      @media (orientation: landscape) and (min-width: 768px) {
+        .rewards-grid {
+          max-width: 600px;
         }
       }
 
       /* Unicorn card styles */
       .unicorn-card {
         position: relative;
-        width: 100px;
-        height: 100px;
-        border-radius: 12px;
+        width: 65px;
+        height: 65px;
+        border-radius: 8px;
         cursor: pointer;
         transition: all 0.3s ease;
         transform-style: preserve-3d;
         perspective: 1000px;
+      }
+
+      @media (orientation: landscape) and (max-height: 600px) {
+        .unicorn-card {
+          width: 55px;
+          height: 55px;
+          border-radius: 6px;
+        }
+      }
+
+      @media (min-width: 768px) {
+        .unicorn-card {
+          width: 100px;
+          height: 100px;
+          border-radius: 12px;
+        }
       }
 
       .unicorn-card:hover {
@@ -894,7 +934,8 @@
 
       .card-name-visible {
         opacity: 1 !important;
-        animation: none;
+        animation: none !important;
+        transform: translateX(-50%) translateY(0) !important;
       }
 
       @keyframes nameAppear {
@@ -1008,6 +1049,18 @@
         }
       }
 
+      .btn-size-compact {
+        font-size: 1.25rem;
+        padding: 0.75rem 1.5rem;
+      }
+
+      @media (min-width: 768px) {
+        .btn-size-compact {
+          font-size: 1.5rem;
+          padding: 1rem 2rem;
+        }
+      }
+
       .btn-responsive {
         width: 100%;
       }
@@ -1098,7 +1151,7 @@
     ></div>
 
     <div
-      class="container mx-auto p-2 md:p-4 max-w-full md:max-w-4xl flex items-center justify-center relative z-10"
+      class="container mx-auto p-1 sm:p-2 md:p-4 max-w-full md:max-w-4xl min-h-screen max-h-screen flex items-center justify-center relative z-10"
     >
       <!-- Start Screen -->
       <div
@@ -1106,23 +1159,23 @@
         class="text-center w-full max-w-md md:max-w-4xl px-6 py-8"
       >
         <h1
-          class="text-7xl md:text-8xl text-purple-600 mb-8 md:mb-10 title-glow title-pulse font-black"
+          class="text-4xl sm:text-5xl md:text-7xl lg:text-8xl text-purple-600 mb-6 sm:mb-8 md:mb-10 title-glow title-pulse font-black"
         >
           🦄 Unicorn Numbers
         </h1>
         <!-- Language Selection - Click to Start -->
         <div
-          class="flex flex-col md:flex-row justify-center gap-4 md:gap-6 w-full"
+          class="flex flex-col md:flex-row justify-center gap-2 sm:gap-3 md:gap-6 w-full"
         >
           <button
             id="lang-en"
-            class="text-white text-3xl md:text-4xl px-10 py-6 md:px-8 md:py-4 rounded-lg tap-target transition-all duration-300 flex-1 md:flex-none md:min-w-[180px] language-button-3d language-button-3d-blue"
+            class="text-white text-xl sm:text-xl md:text-3xl lg:text-4xl px-4 py-3 sm:px-6 sm:py-4 md:px-8 md:py-4 lg:px-10 lg:py-6 rounded-lg tap-target transition-all duration-300 flex-1 md:flex-none md:min-w-[180px] language-button-3d language-button-3d-blue"
           >
             🇬🇧 English
           </button>
           <button
             id="lang-de"
-            class="text-white text-3xl md:text-4xl px-10 py-6 md:px-8 md:py-4 rounded-lg tap-target transition-all duration-300 flex-1 md:flex-none md:min-w-[180px] language-button-3d language-button-3d-green"
+            class="text-white text-xl sm:text-xl md:text-3xl lg:text-4xl px-4 py-3 sm:px-6 sm:py-4 md:px-8 md:py-4 lg:px-10 lg:py-6 rounded-lg tap-target transition-all duration-300 flex-1 md:flex-none md:min-w-[180px] language-button-3d language-button-3d-green"
           >
             🇩🇪 Deutsch
           </button>
@@ -1132,23 +1185,23 @@
       <!-- Intro Screen -->
       <div
         id="intro-screen"
-        class="hidden text-center glass-frame rounded-lg p-6 md:p-8 w-full max-w-md md:max-w-2xl flex flex-col justify-center cursor-pointer"
+        class="hidden text-center glass-frame rounded-lg p-3 sm:p-4 md:p-6 lg:p-8 w-full max-w-md md:max-w-2xl flex flex-col justify-center cursor-pointer"
       >
         <h1
-          class="text-5xl md:text-6xl text-purple-600 mb-6 md:mb-8"
+          class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-purple-600 mb-4 sm:mb-6 md:mb-8"
           data-i18n="introScreen.title"
         >
           🦄 Unicorn Numbers
         </h1>
         <p
-          class="text-2xl md:text-3xl text-gray-700 mb-8 md:mb-10 subtitle-pulse"
+          class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-700 mb-6 sm:mb-8 md:mb-10 subtitle-pulse"
           data-i18n="introScreen.subtitle"
         >
           Learn the numbers 0-9!
         </p>
         <button
           id="play-button"
-          class="bg-purple-600 hover:bg-purple-700 text-white text-3xl md:text-4xl px-12 py-6 md:px-10 md:py-5 rounded-lg tap-target transition-colors button-fade-in-delayed button-pulse"
+          class="bg-purple-600 hover:bg-purple-700 text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl px-6 py-3 sm:px-8 sm:py-4 md:px-10 md:py-5 rounded-lg tap-target transition-colors button-fade-in-delayed button-pulse"
           data-i18n="introScreen.pressToPlay"
         >
           Press to play
@@ -1158,7 +1211,7 @@
       <!-- Number Presentation Screen -->
       <div
         id="number-presentation"
-        class="hidden text-center glass-frame rounded-lg p-6 md:p-8 cursor-pointer w-full max-w-md md:max-w-2xl flex flex-col justify-center"
+        class="hidden text-center glass-frame rounded-lg p-3 sm:p-4 md:p-6 lg:p-8 cursor-pointer w-full max-w-md md:max-w-2xl flex flex-col justify-center"
         onclick="gameController.continueToChoices()"
       >
         <div class="mb-6 md:mb-4">
@@ -1172,13 +1225,13 @@
         <div class="relative mb-6 md:mb-8">
           <div
             id="presented-number"
-            class="text-[12rem] md:text-[16rem] lg:text-[20rem] text-purple-600 number-hidden font-bold leading-none"
+            class="text-[8rem] sm:text-[10rem] md:text-[12rem] lg:text-[16rem] xl:text-[20rem] text-purple-600 number-hidden font-bold leading-none"
           >
             0
           </div>
           <div
             id="presented-emoji"
-            class="absolute inset-0 text-[12rem] md:text-[16rem] lg:text-[20rem] emoji-hidden font-bold leading-none flex items-center justify-center"
+            class="absolute inset-0 text-[8rem] sm:text-[10rem] md:text-[12rem] lg:text-[16rem] xl:text-[20rem] emoji-hidden font-bold leading-none flex items-center justify-center"
           >
             🥚
           </div>
@@ -1195,7 +1248,7 @@
       <!-- Game Screen -->
       <div
         id="game-screen"
-        class="hidden text-center glass-frame rounded-lg p-6 md:p-8 w-full max-w-md md:max-w-4xl flex flex-col justify-center"
+        class="hidden text-center glass-frame rounded-lg p-3 sm:p-4 md:p-6 lg:p-8 w-full max-w-md md:max-w-4xl flex flex-col justify-center"
       >
         <div class="mb-4 md:mb-6">
           <span class="text-xl md:text-2xl text-gray-600"
@@ -1206,7 +1259,7 @@
           >
         </div>
         <h2
-          class="text-4xl md:text-5xl lg:text-6xl text-purple-600 mb-8 md:mb-12"
+          class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-purple-600 mb-6 sm:mb-8 md:mb-12"
           data-i18n="gameScreen.instruction"
         >
           Find the right number!
@@ -1222,17 +1275,17 @@
       <!-- End Screen -->
       <div
         id="end-screen"
-        class="hidden text-center glass-frame rounded-lg p-6 md:p-8 w-full max-w-md md:max-w-3xl flex flex-col justify-center"
+        class="hidden text-center glass-frame rounded-lg p-3 sm:p-4 md:p-6 lg:p-8 w-full max-w-md md:max-w-3xl flex flex-col justify-center"
       >
         <h2
-          class="text-4xl md:text-5xl text-purple-600 mb-6 md:mb-8"
+          class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-purple-600 mb-4 sm:mb-6 md:mb-8"
           data-i18n="endScreen.greatJob"
         >
           Great Job!
         </h2>
         <div
           id="score-display"
-          class="text-2xl md:text-3xl text-gray-700 mb-8 md:mb-10"
+          class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-700 mb-6 sm:mb-8 md:mb-10"
         ></div>
         <div
           id="unicorn-reward"
@@ -1250,29 +1303,29 @@
       <!-- Rewards Screen -->
       <div
         id="rewards-screen"
-        class="hidden text-center glass-frame rounded-lg p-6 md:p-8 w-full max-w-md md:max-w-6xl flex flex-col justify-center"
+        class="hidden text-center glass-frame rounded-lg p-3 sm:p-4 md:p-6 lg:p-8 w-full max-w-md md:max-w-6xl flex flex-col justify-center"
       >
         <h2
-          class="text-4xl md:text-5xl text-purple-600 mb-4 md:mb-6"
+          class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-purple-600 mb-3 sm:mb-4 md:mb-6"
           data-i18n="rewardsScreen.title"
         >
-          🦄 Unicorn Collection
+          🦄 Collection
         </h2>
         <div
           id="rewards-instruction"
-          class="text-lg md:text-xl text-gray-700 mb-6 md:mb-8"
+          class="text-sm sm:text-base md:text-lg lg:text-xl text-gray-700 mb-4 sm:mb-6 md:mb-8"
         >
           Choose a unicorn to unlock
         </div>
         <div
           id="unicorn-grid"
-          class="grid gap-4 md:gap-6 mb-6 md:mb-8 rewards-grid"
+          class="grid gap-2 sm:gap-3 md:gap-6 mb-4 sm:mb-6 md:mb-8 rewards-grid"
         >
           <!-- Unicorn cards will be populated by JavaScript -->
         </div>
         <button
           id="rewards-continue-button"
-          class="btn-primary btn-size-normal btn-responsive transition-all opacity-0 pointer-events-none"
+          class="btn-primary btn-size-compact btn-responsive transition-all opacity-0 pointer-events-none"
           data-i18n="rewardsScreen.startGame"
         >
           Start Game
