@@ -1402,6 +1402,10 @@ class GameController {
       if (unicorn) {
         this.updateCardToUnlocked(cardElement, unicorn)
         this.showUnlockCelebration(cardElement)
+        // Auto-zoom on the newly unlocked unicorn after a brief delay
+        setTimeout(() => {
+          this.openUnicornModal(unicorn)
+        }, 800) // Wait for celebration to be visible
       }
     }, 400) // Half of flip duration
 
