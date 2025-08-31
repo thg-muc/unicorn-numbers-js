@@ -1671,4 +1671,57 @@ let particleSystem
 document.addEventListener('DOMContentLoaded', () => {
   gameController = new GameController()
   particleSystem = new ParticleSystem()
+
+  // Register service worker for PWA functionality
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker
+        .register('/service-worker.js')
+        .then(registration => {
+          console.log(
+            'ServiceWorker registration successful with scope: ',
+            registration.scope
+          )
+
+          // Check for updates
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing
+            if (newWorker) {
+              newWorker.addEventListener('statechange', () => {
+                if (
+                  newWorker.state === 'installed' &&
+                  navigator.serviceWorker.controller
+                ) {
+                  // New content is available, show update notification
+                  console.log('New content is available; please refresh.')
+                  // Optionally show a user-friendly update notification
+                }
+              })
+            }
+          })
+        })
+        .catch(error => {
+          console.log('ServiceWorker registration failed: ', error)
+        })
+    })
+  }
+
+  // Handle install prompt for PWA
+  let deferredPrompt
+  window.addEventListener('beforeinstallprompt', e => {
+    console.log('PWA install prompt available')
+    // Prevent the mini-infobar from appearing on mobile
+    e.preventDefault()
+    // Stash the event so it can be triggered later
+    deferredPrompt = e
+
+    // Optionally show your own install promotion UI here
+    // For now, we'll just log it
+    console.log('PWA can be installed')
+  })
+
+  window.addEventListener('appinstalled', evt => {
+    console.log('PWA was installed successfully')
+    // Optionally track this event or show a success message
+  })
 })
