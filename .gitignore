@@ -47,5 +47,6 @@ pids
 
 # Project specific ignores
 TODO
+_dev*
 .husky/commit-msg-local
 
