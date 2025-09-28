@@ -387,7 +387,7 @@ class GameSession {
   constructor() {
     this.currentRound = 0
     this.difficulty = 'Easy'
-    this.totalRounds = this.difficulty === 'Easy' ? 2 : 10
+    this.totalRounds = this.difficulty === 'Easy' ? 5 : 10
     this.repetitionsPerRound = 3
     this.currentRepetition = 0
     this.score = 0
