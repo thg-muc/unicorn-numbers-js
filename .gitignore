@@ -50,3 +50,4 @@ TODO
 _dev*
 .husky/commit-msg-local
 
+.vercel
