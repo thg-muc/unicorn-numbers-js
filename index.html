@@ -2,8 +2,49 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
     <title>Unicorn Numbers - Number Recognition Game</title>
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    <!-- iOS PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Unicorn Numbers" />
+
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#9333ea" />
+    <meta name="msapplication-TileColor" content="#9333ea" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+
+    <!-- iOS Splash Screen Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- Additional PWA Meta Tags -->
+    <meta name="application-name" content="Unicorn Numbers" />
+    <meta
+      name="msapplication-tooltip"
+      content="Educational number recognition game for children"
+    />
+    <meta name="msapplication-starturl" content="/" />
+
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/assets/icons/icon-192x192.png" as="image" />
+    <link rel="preload" href="/assets/images/background.jpg" as="image" />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,6 +53,14 @@
       rel="stylesheet"
     />
     <style>
+      /* CSS Custom Properties for Safe Area Performance */
+      :root {
+        --safe-area-top: env(safe-area-inset-top, 0px);
+        --safe-area-left: env(safe-area-inset-left, 0px);
+        --safe-area-right: env(safe-area-inset-right, 0px);
+        --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+      }
+
       /* Custom tap target sizing for touch devices */
       .tap-target {
         min-width: 48px;
@@ -37,7 +86,7 @@
 
       /* Number presentation animation */
       .number-presentation {
-        animation: numberBounce 2s ease-in-out;
+        animation: numberBounce 2s ease-in-out forwards;
       }
 
       /* Hidden state before animation starts */
@@ -58,6 +107,42 @@
         100% {
           transform: scale(1) rotate(0deg);
           opacity: 1;
+        }
+      }
+
+      /* Emoji animations */
+      .emoji-hidden {
+        opacity: 0;
+        transform: scale(0.5);
+      }
+
+      .emoji-fade-in {
+        animation: emojiAppear 1s ease-in-out forwards;
+      }
+
+      .number-fade-out {
+        animation: numberDisappear 1s ease-in-out forwards;
+      }
+
+      @keyframes emojiAppear {
+        0% {
+          opacity: 0;
+          transform: scale(0.5);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(0.75);
+        }
+      }
+
+      @keyframes numberDisappear {
+        0% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(0.8);
         }
       }
 
@@ -149,98 +234,1095 @@
 
       /* Smooth transition animations */
       .fade-out {
-        animation: fadeOut 200ms ease-out forwards;
+        animation: fadeOut 300ms ease-out forwards;
       }
 
       .fade-in {
-        animation: fadeIn 200ms ease-in forwards;
+        animation: fadeIn 300ms ease-in forwards;
         opacity: 0;
+      }
+
+      /* Enhanced magical transition effects */
+      .magical-exit {
+        animation: magicalExit 1000ms ease-out forwards;
+      }
+
+      .magical-entrance {
+        animation: magicalEntrance 700ms cubic-bezier(0.34, 1.56, 0.64, 1)
+          forwards;
+        opacity: 0;
+        transform: translateY(100px) scale(0.8);
+      }
+
+      .background-pulse {
+        animation: backgroundPulse 1000ms ease-out;
+      }
+
+      /* Enhanced sparkle burst effect with more sparkles */
+      .sparkle-burst {
+        position: relative;
+        overflow: visible;
+      }
+
+      .sparkle-burst::before,
+      .sparkle-burst::after {
+        content: '✨';
+        position: absolute;
+        font-size: 1.5rem;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 10;
+      }
+
+      .sparkle-burst.active::before {
+        top: 20%;
+        right: 15%;
+        animation: sparkleOut1 1500ms ease-out;
+      }
+
+      .sparkle-burst.active::after {
+        bottom: 25%;
+        left: 20%;
+        animation: sparkleOut2 1500ms ease-out 100ms;
+      }
+
+      /* Additional sparkles using box-shadow */
+      .sparkle-burst.active {
+        position: relative;
+      }
+
+      .sparkle-burst.active::after {
+        box-shadow:
+          30px -30px 0 0 transparent,
+          -40px 10px 0 0 transparent,
+          10px -40px 0 0 transparent,
+          -20px -20px 0 0 transparent;
+        animation:
+          sparkleOut2 1500ms ease-out 100ms,
+          extraSparkles 1500ms ease-out 50ms;
+      }
+
+      .sparkle-burst.active::before {
+        box-shadow:
+          -25px 35px 0 0 transparent,
+          35px 25px 0 0 transparent,
+          -10px -35px 0 0 transparent;
+        animation:
+          sparkleOut1 1500ms ease-out,
+          moreSparkles 1500ms ease-out 150ms;
+      }
+
+      @keyframes sparkleOut1 {
+        0% {
+          opacity: 0;
+          transform: scale(0) translateX(0) translateY(0);
+        }
+        30% {
+          opacity: 1;
+          transform: scale(1.2) translateX(20px) translateY(-20px);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(0.5) translateX(60px) translateY(-60px);
+        }
+      }
+
+      @keyframes sparkleOut2 {
+        0% {
+          opacity: 0;
+          transform: scale(0) translateX(0) translateY(0);
+        }
+        30% {
+          opacity: 1;
+          transform: scale(1.1) translateX(-30px) translateY(15px);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(0.7) translateX(-70px) translateY(40px);
+        }
+      }
+
+      @keyframes extraSparkles {
+        0% {
+          box-shadow:
+            30px -30px 0 0 transparent,
+            -40px 10px 0 0 transparent,
+            10px -40px 0 0 transparent,
+            -20px -20px 0 0 transparent;
+        }
+        20% {
+          box-shadow:
+            30px -30px 0 1px rgba(255, 215, 0, 0.8),
+            -40px 10px 0 1px rgba(255, 192, 203, 0.8),
+            10px -40px 0 1px rgba(173, 216, 230, 0.8),
+            -20px -20px 0 1px rgba(255, 255, 255, 0.9);
+        }
+        70% {
+          box-shadow:
+            45px -45px 0 1px rgba(255, 215, 0, 0.4),
+            -55px 15px 0 1px rgba(255, 192, 203, 0.4),
+            15px -55px 0 1px rgba(173, 216, 230, 0.4),
+            -35px -35px 0 1px rgba(255, 255, 255, 0.4);
+        }
+        100% {
+          box-shadow:
+            60px -60px 0 0 transparent,
+            -70px 25px 0 0 transparent,
+            25px -70px 0 0 transparent,
+            -50px -50px 0 0 transparent;
+        }
+      }
+
+      @keyframes moreSparkles {
+        0% {
+          box-shadow:
+            -25px 35px 0 0 transparent,
+            35px 25px 0 0 transparent,
+            -10px -35px 0 0 transparent;
+        }
+        25% {
+          box-shadow:
+            -25px 35px 0 1px rgba(147, 51, 234, 0.8),
+            35px 25px 0 1px rgba(34, 197, 94, 0.8),
+            -10px -35px 0 1px rgba(59, 130, 246, 0.8);
+        }
+        75% {
+          box-shadow:
+            -40px 50px 0 1px rgba(147, 51, 234, 0.3),
+            50px 40px 0 1px rgba(34, 197, 94, 0.3),
+            -15px -50px 0 1px rgba(59, 130, 246, 0.3);
+        }
+        100% {
+          box-shadow:
+            -55px 65px 0 0 transparent,
+            65px 55px 0 0 transparent,
+            -25px -65px 0 0 transparent;
+        }
       }
 
       @keyframes fadeOut {
         from {
           opacity: 1;
+          transform: scale(1);
         }
         to {
           opacity: 0;
+          transform: scale(0.98);
         }
       }
 
       @keyframes fadeIn {
         from {
           opacity: 0;
+          transform: scale(1.02);
         }
         to {
           opacity: 1;
+          transform: scale(1);
         }
+      }
+
+      /* Subtle magical transition keyframes */
+      @keyframes magicalExit {
+        0% {
+          opacity: 1;
+          transform: scale(1) rotate(0deg);
+          filter: brightness(1);
+        }
+        30% {
+          filter: brightness(1.1);
+          box-shadow:
+            0 8px 32px rgba(0, 0, 0, 0.12),
+            0 2px 8px rgba(0, 0, 0, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3),
+            0 0 30px rgba(147, 51, 234, 0.3);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(0.95) rotate(-2deg);
+          filter: brightness(1.2);
+        }
+      }
+
+      @keyframes magicalEntrance {
+        0% {
+          opacity: 0;
+          transform: translateY(100px) scale(0.8);
+        }
+        60% {
+          opacity: 0.8;
+          transform: translateY(-10px) scale(1.02);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes backgroundPulse {
+        0% {
+          filter: brightness(1);
+        }
+        50% {
+          filter: brightness(1.05);
+        }
+        100% {
+          filter: brightness(1);
+        }
+      }
+
+      /* Delayed fade-in for play button */
+      @keyframes fadeInDelayed {
+        0%,
+        25% {
+          opacity: 0;
+          pointer-events: none;
+        }
+        100% {
+          opacity: 1;
+          pointer-events: auto;
+        }
+      }
+
+      .button-fade-in-delayed {
+        opacity: 0;
+        animation: fadeInDelayed 4s ease-in-out forwards;
+      }
+
+      /* Strong pulse animation for play button */
+      @keyframes buttonPulse {
+        0%,
+        100% {
+          opacity: 1;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        50% {
+          opacity: 0.75;
+          box-shadow:
+            0 8px 24px rgba(147, 51, 234, 0.6),
+            0 0 20px rgba(147, 51, 234, 0.4),
+            0 0 40px rgba(147, 51, 234, 0.2);
+        }
+      }
+
+      .button-pulse {
+        animation: buttonPulse 4s ease-in-out infinite;
+      }
+
+      /* Pulse animation for subtitle that stops when button appears */
+      @keyframes pulseSubtitle {
+        0%,
+        75% {
+          transform: scale(1);
+        }
+        12.5% {
+          transform: scale(1.02);
+        }
+        25% {
+          transform: scale(1);
+        }
+        37.5% {
+          transform: scale(1.02);
+        }
+        50% {
+          transform: scale(1);
+        }
+        62.5% {
+          transform: scale(1.02);
+        }
+        75%,
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .subtitle-pulse {
+        animation: pulseSubtitle 4s ease-in-out forwards;
+      }
+
+      /* Background image styling */
+      body {
+        background: linear-gradient(to bottom right, #f3f4f6, #d1d5db);
+        position: relative;
+      }
+
+      /* Animated background pseudo-element with safe area coverage */
+      body::before {
+        content: '';
+        position: fixed;
+        /* Position offset to cover safe areas */
+        top: calc(-5% - var(--safe-area-top));
+        left: calc(-5% - var(--safe-area-left));
+        /* Calculated dimensions to include safe areas for full coverage */
+        width: calc(110% + var(--safe-area-left) + var(--safe-area-right));
+        height: calc(110% + var(--safe-area-top) + var(--safe-area-bottom));
+        /* Standard background configuration */
+        background: url('assets/images/background.jpg') center/cover no-repeat;
+        z-index: -1;
+        will-change: transform;
+        animation: kenBurnsBreathe 40s ease-in-out infinite;
+      }
+
+      /* Combined Ken Burns + breathing animation */
+      @keyframes kenBurnsBreathe {
+        0%,
+        100% {
+          transform: scale(1) translate(0, 0);
+        }
+        12.5% {
+          transform: scale(1.013) translate(-0.6%, -0.3%);
+        }
+        25% {
+          transform: scale(1.038) translate(-1.25%, -0.6%);
+        }
+        37.5% {
+          transform: scale(1.05) translate(-1.9%, -0.9%);
+        }
+        50% {
+          transform: scale(1.0625) translate(-2.5%, -2.5%);
+        }
+        62.5% {
+          transform: scale(1.05) translate(-1.9%, -0.9%);
+        }
+        75% {
+          transform: scale(1.038) translate(-1.25%, -0.6%);
+        }
+        87.5% {
+          transform: scale(1.013) translate(-0.6%, -0.3%);
+        }
+      }
+
+      /* iOS Safe Area Support */
+      body {
+        padding-left: var(--safe-area-left);
+        padding-right: var(--safe-area-right);
+        padding-top: var(--safe-area-top);
+        padding-bottom: var(--safe-area-bottom);
+      }
+
+      /* Override container margins to use full width with safe area padding */
+      .container {
+        margin-left: 0;
+        margin-right: 0;
+        width: 100%;
+      }
+
+      /* Ensure content doesn't overlap safe areas in landscape */
+      @media (orientation: landscape) {
+        body {
+          padding-left: var(--safe-area-left);
+          padding-right: var(--safe-area-right);
+        }
+        .container {
+          padding-left: max(var(--safe-area-left), 1rem);
+          padding-right: max(var(--safe-area-right), 1rem);
+        }
+      }
+
+      /* Glowing title effects for visibility on background */
+      .title-glow {
+        text-shadow:
+          0 0 10px rgba(147, 51, 234, 0.8),
+          0 0 20px rgba(147, 51, 234, 0.6),
+          0 0 30px rgba(147, 51, 234, 0.4),
+          0 0 40px rgba(255, 255, 255, 0.8),
+          0 4px 8px rgba(0, 0, 0, 0.3);
+        animation: titlePulse 3s ease-in-out infinite;
+      }
+
+      @keyframes titlePulse {
+        0%,
+        100% {
+          text-shadow:
+            0 0 10px rgba(147, 51, 234, 0.8),
+            0 0 20px rgba(147, 51, 234, 0.6),
+            0 0 30px rgba(147, 51, 234, 0.4),
+            0 0 40px rgba(255, 255, 255, 0.8),
+            0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        50% {
+          text-shadow:
+            0 0 15px rgba(147, 51, 234, 1),
+            0 0 30px rgba(147, 51, 234, 0.8),
+            0 0 45px rgba(147, 51, 234, 0.6),
+            0 0 60px rgba(255, 255, 255, 1),
+            0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+      }
+
+      /* Subtle scale pulse animation */
+      .title-pulse {
+        animation: titleScalePulse 6s ease-in-out infinite;
+      }
+
+      @keyframes titleScalePulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.01);
+        }
+      }
+
+      /* Semi-transparent button backdrop */
+      .button-backdrop {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Base 3D glassmorphic styling for language buttons */
+      .language-button-3d {
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow:
+          0 8px 32px rgba(0, 0, 0, 0.12),
+          0 2px 8px rgba(0, 0, 0, 0.08),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      }
+
+      /* Blue tinted glass button */
+      .language-button-3d-blue {
+        background: rgba(59, 130, 246, 0.65);
+      }
+
+      /* Green tinted glass button */
+      .language-button-3d-green {
+        background: rgba(34, 197, 94, 0.65);
+      }
+
+      /* Hover effects - lighter than standard */
+      .language-button-3d-blue:hover {
+        background: rgba(59, 130, 246, 0.5);
+      }
+
+      .language-button-3d-green:hover {
+        background: rgba(34, 197, 94, 0.5);
+      }
+
+      /* Touch press effect for language buttons */
+      .language-button-3d:active {
+        transform: translateY(1px);
+        box-shadow:
+          0 4px 16px rgba(0, 0, 0, 0.15),
+          0 1px 4px rgba(0, 0, 0, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.4),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+      }
+
+      /* Active state backgrounds for colored glass buttons */
+      .language-button-3d-blue:active {
+        background: rgba(59, 130, 246, 0.75);
+      }
+
+      .language-button-3d-green:active {
+        background: rgba(34, 197, 94, 0.75);
+      }
+
+      /* Glassmorphic frame effect */
+      .glass-frame {
+        background: rgba(226, 232, 240, 0.2);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(203, 213, 225, 0.3);
+        box-shadow:
+          0 8px 32px rgba(0, 0, 0, 0.16),
+          0 2px 8px rgba(0, 0, 0, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        max-height: 96vh;
+        overflow-y: auto;
+      }
+
+      /* Floating Particle System */
+      .floating-particle {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        will-change: transform, opacity;
+        animation: floatUp var(--duration, 20s) linear infinite;
+        animation-delay: var(--delay, 0s);
+        opacity: var(--opacity, 0.3);
+        width: var(--size, 4px);
+        height: var(--size, 4px);
+        background: var(--color, rgba(255, 255, 255, 0.8));
+        box-shadow:
+          0 0 var(--glow-size, 6px) var(--glow-color, rgba(255, 255, 255, 0.5)),
+          inset 0 0 var(--inner-glow, 2px) rgba(255, 255, 255, 0.3);
+      }
+
+      .floating-particle.stardust {
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 1) 0%,
+          rgba(255, 215, 0, 0.8) 70%,
+          transparent 100%
+        );
+        box-shadow:
+          0 0 12px rgba(255, 215, 0, 0.8),
+          0 0 24px rgba(255, 255, 255, 0.6);
+      }
+
+      .floating-particle.sparkle {
+        background: radial-gradient(
+          circle,
+          rgba(255, 192, 203, 1) 0%,
+          rgba(173, 216, 230, 0.8) 100%
+        );
+        box-shadow:
+          0 0 12px rgba(255, 192, 203, 0.8),
+          0 0 24px rgba(173, 216, 230, 0.6);
+      }
+
+      .floating-particle.twinkle {
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 1) 0%,
+          rgba(147, 51, 234, 0.8) 100%
+        );
+        animation:
+          floatUp var(--duration, 25s) linear infinite,
+          twinkleEffect 2s ease-in-out infinite;
+        animation-delay: var(--delay, 0s), calc(var(--delay, 0s) + 1s);
+        box-shadow:
+          0 0 16px rgba(147, 51, 234, 0.9),
+          0 0 32px rgba(255, 255, 255, 0.7);
+      }
+
+      @keyframes floatUp {
+        0% {
+          transform: translateY(0) translateX(0) scale(0);
+          opacity: 0;
+        }
+        5% {
+          opacity: var(--opacity, 0.6);
+          transform: translateY(-50px) translateX(0) scale(1);
+        }
+        25% {
+          transform: translateY(-25vh) translateX(var(--drift-x1, 15px))
+            scale(1);
+        }
+        50% {
+          transform: translateY(-50vh) translateX(var(--drift-x2, -10px))
+            scale(1);
+        }
+        75% {
+          transform: translateY(-75vh) translateX(var(--drift-x3, 20px))
+            scale(1);
+        }
+        95% {
+          opacity: var(--opacity, 0.6);
+          transform: translateY(-100vh) translateX(var(--drift-x4, -5px))
+            scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(calc(-100vh - 50px))
+            translateX(var(--drift-x4, -5px)) scale(0);
+        }
+      }
+
+      @keyframes twinkleEffect {
+        0%,
+        100% {
+          box-shadow:
+            0 0 var(--glow-size, 6px)
+              var(--glow-color, rgba(255, 255, 255, 0.5)),
+            inset 0 0 var(--inner-glow, 2px) rgba(255, 255, 255, 0.3);
+        }
+        50% {
+          box-shadow:
+            0 0 calc(var(--glow-size, 6px) * 1.5)
+              var(--glow-color, rgba(255, 255, 255, 0.8)),
+            inset 0 0 calc(var(--inner-glow, 2px) * 1.5)
+              rgba(255, 255, 255, 0.6);
+        }
+      }
+
+      /* Rewards Screen Styles */
+      .rewards-grid {
+        display: grid;
+        justify-items: center;
+      }
+
+      /* Responsive grid layout */
+      @media (orientation: portrait) {
+        .rewards-grid {
+          grid-template-columns: repeat(3, 1fr);
+          max-width: 280px;
+          margin: 0 auto;
+        }
+      }
+
+      @media (orientation: landscape) {
+        .rewards-grid {
+          grid-template-columns: repeat(5, 1fr);
+          max-width: 350px;
+          margin: 0 auto;
+        }
+      }
+
+      /* Unicorn card styles */
+      .unicorn-card {
+        position: relative;
+        width: 55px;
+        height: 55px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        transform-style: preserve-3d;
+        perspective: 1000px;
+      }
+      /* Unicorn card for larger screens */
+      @media (min-height: 640px) {
+        .unicorn-card {
+          width: 70px;
+          height: 70px;
+          border-radius: 8px;
+        }
+      }
+
+      .unicorn-card:hover {
+        transform: scale(1.05);
+      }
+
+      .unicorn-card.flipping {
+        transform: rotateY(180deg);
+        transition: transform 0.8s ease-in-out;
+      }
+
+      /* Card front (mystery state) */
+      .card-front,
+      .card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 12px;
+        backface-visibility: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .card-back {
+        transform: rotateY(180deg);
+      }
+
+      /* Mystery card styling */
+      .mystery-card {
+        background: linear-gradient(
+          45deg,
+          rgba(251, 191, 36, 0.8),
+          rgba(245, 158, 11, 0.8)
+        );
+        backdrop-filter: blur(8px);
+        border: 2px solid transparent;
+        box-shadow:
+          0 4px 20px rgba(251, 191, 36, 0.4),
+          0 0 0 1px rgba(255, 255, 255, 0.2);
+        animation: mysteryGlow 3s ease-in-out infinite;
+      }
+
+      @keyframes mysteryGlow {
+        0%,
+        100% {
+          box-shadow:
+            0 4px 20px rgba(251, 191, 36, 0.4),
+            0 0 0 1px rgba(255, 255, 255, 0.2),
+            0 0 10px rgba(251, 191, 36, 0.3);
+        }
+        50% {
+          box-shadow:
+            0 6px 25px rgba(251, 191, 36, 0.6),
+            0 0 0 1px rgba(255, 255, 255, 0.4),
+            0 0 20px rgba(251, 191, 36, 0.5);
+        }
+      }
+
+      .mystery-icon {
+        font-size: 2.4rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Unlocked card styling */
+      .unlocked-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(8px);
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        box-shadow:
+          0 4px 15px rgba(0, 0, 0, 0.1),
+          0 0 0 1px rgba(255, 255, 255, 0.3);
+        overflow: hidden;
+      }
+
+      .unlocked-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 10px;
+      }
+
+      /* Card name label */
+      .card-name {
+        position: absolute;
+        bottom: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(4px);
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #374151;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        white-space: nowrap;
+        opacity: 0;
+        animation: nameAppear 0.5s ease-out 0.5s forwards;
+      }
+
+      .card-name-visible {
+        opacity: 1 !important;
+        animation: none !important;
+        transform: translateX(-50%) translateY(0) !important;
+      }
+
+      @keyframes nameAppear {
+        from {
+          opacity: 0;
+          transform: translateX(-50%) translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+      }
+
+      /* Unlock celebration effect */
+      .unlock-celebration {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        border-radius: 12px;
+        z-index: 10;
+      }
+
+      .unlock-celebration::before,
+      .unlock-celebration::after {
+        content: '✨';
+        position: absolute;
+        font-size: 1.5rem;
+        animation: celebrationSpark 1.5s ease-out;
+        pointer-events: none;
+      }
+
+      .unlock-celebration::before {
+        top: -10px;
+        right: -10px;
+        animation-delay: 0.2s;
+      }
+
+      .unlock-celebration::after {
+        bottom: -10px;
+        left: -10px;
+        animation-delay: 0.4s;
+      }
+
+      @keyframes celebrationSpark {
+        0% {
+          transform: scale(0) rotate(0deg);
+          opacity: 0;
+        }
+        50% {
+          transform: scale(1.5) rotate(180deg);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(0) rotate(360deg);
+          opacity: 0;
+        }
+      }
+
+      /* Hide rewards screen elements in small landscape mode */
+      @media (orientation: landscape) and (max-height: 640px) {
+        .hide-in-small-landscape {
+          display: none !important;
+        }
+      }
+
+      /* Reusable button styles */
+      .btn-primary {
+        background-color: rgb(147, 51, 234);
+        color: white;
+        border-radius: 0.5rem;
+        transition: all 0.15s ease;
+        font-weight: 700;
+        min-width: 48px;
+        min-height: 48px;
+        cursor: pointer;
+      }
+
+      .btn-primary:hover {
+        background-color: rgb(126, 34, 206);
+      }
+
+      .btn-secondary {
+        background-color: rgb(245, 158, 11);
+        color: white;
+        border-radius: 0.5rem;
+        transition: all 0.15s ease;
+        font-weight: 700;
+        min-width: 48px;
+        min-height: 48px;
+        cursor: pointer;
+      }
+
+      .btn-secondary:hover {
+        background-color: rgb(217, 119, 6);
+      }
+
+      .btn-size-normal {
+        font-size: 1.5rem;
+        padding: 1rem 2rem;
+      }
+
+      @media (min-width: 768px) {
+        .btn-size-normal {
+          font-size: 1.875rem;
+          padding: 1.5rem 3rem;
+        }
+      }
+
+      .btn-size-large {
+        font-size: 1.875rem;
+        padding: 1.5rem 3rem;
+      }
+
+      @media (min-width: 768px) {
+        .btn-size-large {
+          font-size: 2.25rem;
+          padding: 1.5rem 2.5rem;
+        }
+      }
+
+      .btn-size-compact {
+        font-size: 1.25rem;
+        padding: 0.75rem 1.5rem;
+      }
+
+      @media (min-width: 768px) {
+        .btn-size-compact {
+          font-size: 1.5rem;
+          padding: 1rem 2rem;
+        }
+      }
+
+      .btn-responsive {
+        width: 100%;
+      }
+
+      @media (min-width: 768px) {
+        .btn-responsive {
+          width: auto;
+        }
+      }
+
+      /* Full-screen modal for viewing unicorns */
+      .unicorn-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+
+      .unicorn-modal.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .modal-content {
+        width: 80vmin;
+        height: 80vmin;
+        max-width: 90vw;
+        max-height: 90vh;
+        border-radius: 16px;
+        overflow: hidden;
+        background: white;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        transform: scale(0.8);
+        transition: transform 0.3s ease;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .unicorn-modal.active .modal-content {
+        transform: scale(1);
+      }
+
+      .modal-image-container {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        padding: 1rem;
+      }
+
+      .modal-content img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        display: block;
+      }
+
+      .modal-name {
+        padding: 1rem;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #374151;
+        background: linear-gradient(
+          135deg,
+          rgba(147, 51, 234, 0.1),
+          rgba(59, 130, 246, 0.1)
+        );
       }
     </style>
   </head>
-  <body
-    class="bg-gradient-to-br from-gray-100 to-gray-300 min-h-screen flex items-center justify-center font-bold"
-  >
+  <body class="min-h-screen flex items-center justify-center font-bold">
+    <!-- Floating Particles Container -->
     <div
-      class="container mx-auto p-2 md:p-4 max-w-full md:max-w-4xl min-h-screen flex items-center justify-center"
+      id="particles-container"
+      class="fixed inset-0 pointer-events-none z-0"
+    ></div>
+
+    <div
+      class="container mx-auto p-1 sm:p-2 md:p-4 max-w-full min-h-screen max-h-screen flex items-center justify-center relative z-10"
     >
       <!-- Start Screen -->
-      <div
-        id="start-screen"
-        class="text-center bg-white rounded-lg shadow-lg p-6 md:p-8 w-full max-w-md md:max-w-2xl"
-      >
-        <h1 class="text-5xl md:text-6xl text-purple-600 mb-6 md:mb-8">
+      <div id="start-screen" class="text-center w-full px-6 py-8">
+        <h1
+          class="text-4xl sm:text-5xl md:text-7xl lg:text-8xl text-purple-600 mb-6 sm:mb-8 md:mb-10 title-glow title-pulse font-black"
+        >
           🦄 Unicorn Numbers
         </h1>
-        <p class="text-2xl md:text-3xl text-gray-700 mb-8 md:mb-10">
-          Learn numbers 0-9!
+        <!-- Language Selection - Click to Start -->
+        <div
+          class="flex flex-col md:flex-row justify-center gap-2 sm:gap-3 md:gap-6 w-full"
+        >
+          <button
+            id="lang-en"
+            class="text-white text-xl sm:text-xl md:text-3xl lg:text-4xl px-4 py-3 sm:px-6 sm:py-4 md:px-8 md:py-4 lg:px-10 lg:py-6 rounded-lg tap-target transition-all duration-300 flex-1 md:flex-none md:min-w-[180px] language-button-3d language-button-3d-blue"
+          >
+            🇬🇧 English
+          </button>
+          <button
+            id="lang-de"
+            class="text-white text-xl sm:text-xl md:text-3xl lg:text-4xl px-4 py-3 sm:px-6 sm:py-4 md:px-8 md:py-4 lg:px-10 lg:py-6 rounded-lg tap-target transition-all duration-300 flex-1 md:flex-none md:min-w-[180px] language-button-3d language-button-3d-green"
+          >
+            🇩🇪 Deutsch
+          </button>
+        </div>
+      </div>
+
+      <!-- Intro Screen -->
+      <div
+        id="intro-screen"
+        class="hidden text-center glass-frame rounded-lg p-3 sm:p-4 md:p-6 lg:p-8 w-full flex flex-col justify-center cursor-pointer"
+      >
+        <h1
+          class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-purple-600 mb-4 sm:mb-6 md:mb-8"
+          data-i18n="introScreen.title"
+        >
+          🦄 Unicorn Numbers
+        </h1>
+        <p
+          class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-700 mb-6 sm:mb-8 md:mb-10 subtitle-pulse"
+          data-i18n="introScreen.subtitle"
+        >
+          Learn the numbers 0-9!
         </p>
         <button
-          id="start-button"
-          class="bg-purple-600 hover:bg-purple-700 text-white text-3xl md:text-4xl px-12 py-6 rounded-lg tap-target transition-colors w-full md:w-auto"
+          id="play-button"
+          class="bg-purple-600 hover:bg-purple-700 text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl px-6 py-3 sm:px-8 sm:py-4 md:px-10 md:py-5 rounded-lg tap-target transition-colors button-fade-in-delayed button-pulse"
+          data-i18n="introScreen.pressToPlay"
         >
-          Start Game
+          Press to play
         </button>
       </div>
 
       <!-- Number Presentation Screen -->
       <div
         id="number-presentation"
-        class="hidden text-center bg-white rounded-lg shadow-lg p-6 md:p-8 cursor-pointer w-full max-w-md md:max-w-2xl min-h-[80vh] md:min-h-0 flex flex-col justify-center"
+        class="hidden text-center glass-frame rounded-lg p-3 sm:p-4 md:p-6 lg:p-8 cursor-pointer w-full max-w-md md:max-w-2xl flex flex-col justify-center"
         onclick="gameController.continueToChoices()"
       >
         <div class="mb-6 md:mb-4">
           <span class="text-xl md:text-2xl text-gray-600"
-            >Round <span id="presentation-round-counter">1</span> of
+            ><span data-i18n="presentationScreen.round">Round</span>
+            <span id="presentation-round-counter">1</span>
+            <span data-i18n="presentationScreen.of">of</span>
             <span id="presentation-total-rounds">5</span></span
           >
         </div>
-        <div
-          id="presented-number"
-          class="text-[12rem] md:text-[16rem] lg:text-[20rem] text-purple-600 number-hidden font-bold mb-6 md:mb-8 leading-none"
-        >
-          0
+        <div class="relative mb-6 md:mb-8">
+          <div
+            id="presented-number"
+            class="text-[8rem] sm:text-[10rem] md:text-[12rem] lg:text-[16rem] xl:text-[20rem] text-purple-600 number-hidden font-bold leading-none"
+          >
+            0
+          </div>
+          <div
+            id="presented-emoji"
+            class="absolute inset-0 text-[8rem] sm:text-[10rem] md:text-[12rem] lg:text-[16rem] xl:text-[20rem] emoji-hidden font-bold leading-none flex items-center justify-center"
+          >
+            🥚
+          </div>
         </div>
-        <p class="text-xl md:text-2xl text-gray-500">Tap to continue</p>
+        <p
+          id="presentation-instruction"
+          class="text-xl md:text-2xl text-gray-500"
+          data-i18n="presentationScreen.listen"
+        >
+          Listen...
+        </p>
       </div>
 
       <!-- Game Screen -->
       <div
         id="game-screen"
-        class="hidden text-center bg-white rounded-lg shadow-lg p-6 md:p-8 w-full max-w-md md:max-w-4xl min-h-[80vh] md:min-h-0 flex flex-col justify-center"
+        class="hidden text-center glass-frame rounded-lg p-3 sm:p-4 md:p-6 lg:p-8 w-full flex flex-col justify-center"
       >
         <div class="mb-4 md:mb-6">
           <span class="text-xl md:text-2xl text-gray-600"
-            >Round <span id="round-counter">1</span> of
+            ><span data-i18n="gameScreen.round">Round</span>
+            <span id="round-counter">1</span>
+            <span data-i18n="gameScreen.of">of</span>
             <span id="total-rounds">5</span></span
           >
         </div>
         <h2
-          class="text-4xl md:text-5xl lg:text-6xl text-purple-600 mb-8 md:mb-12"
+          class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-purple-600 mb-6 sm:mb-8 md:mb-12"
+          data-i18n="gameScreen.instruction"
         >
           Find the right number!
         </h2>
         <div
           id="choices"
-          class="grid gap-6 md:gap-8 flex-1 items-center justify-center"
+          class="grid gap-6 md:gap-8 items-center justify-center"
         >
           <!-- Choices will be populated by JavaScript -->
         </div>
@@ -249,28 +1331,75 @@
       <!-- End Screen -->
       <div
         id="end-screen"
-        class="hidden text-center bg-white rounded-lg shadow-lg p-6 md:p-8 w-full max-w-md md:max-w-2xl"
+        class="hidden text-center glass-frame rounded-lg p-3 sm:p-4 md:p-6 lg:p-8 w-full flex flex-col justify-center"
       >
-        <h2 class="text-4xl md:text-5xl text-purple-600 mb-6 md:mb-8">
+        <h2
+          class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-purple-600 mb-4 sm:mb-6 md:mb-8"
+          data-i18n="endScreen.greatJob"
+        >
           Great Job!
         </h2>
         <div
           id="score-display"
-          class="text-2xl md:text-3xl text-gray-700 mb-8 md:mb-10"
+          class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-700 mb-6 sm:mb-8 md:mb-10"
         ></div>
         <div
           id="unicorn-reward"
-          class="text-8xl md:text-9xl mb-8 md:mb-10"
+          class="text-6xl md:text-7xl lg:text-8xl mb-8 md:mb-10 flex flex-wrap justify-center gap-2"
         ></div>
         <button
           id="restart-button"
-          class="bg-purple-600 hover:bg-purple-700 text-white text-2xl md:text-3xl px-8 py-4 md:px-12 md:py-6 rounded-lg tap-target transition-colors w-full md:w-auto"
+          class="btn-secondary btn-size-normal btn-responsive"
+          data-i18n="endScreen.collectUnicorns"
         >
-          Play Again
+          Collect Unicorns!
+        </button>
+      </div>
+
+      <!-- Rewards Screen -->
+      <div
+        id="rewards-screen"
+        class="hidden text-center glass-frame rounded-lg p-3 sm:p-4 md:p-6 lg:p-8 w-full flex flex-col justify-center"
+      >
+        <h2
+          class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-purple-600 mb-3 sm:mb-4 md:mb-6 hide-in-small-landscape"
+          data-i18n="rewardsScreen.title"
+        >
+          🦄 Collection
+        </h2>
+        <div
+          id="rewards-instruction"
+          class="text-sm sm:text-base md:text-lg lg:text-xl text-gray-700 mb-4 sm:mb-6 md:mb-8"
+        >
+          Choose a unicorn to unlock
+        </div>
+        <div
+          id="unicorn-grid"
+          class="grid gap-2 sm:gap-3 md:gap-6 landscape:gap-1 landscape:sm:gap-2 mb-2 sm:mb-6 md:mb-8 rewards-grid"
+        >
+          <!-- Unicorn cards will be populated by JavaScript -->
+        </div>
+        <button
+          id="rewards-continue-button"
+          class="btn-primary btn-size-compact btn-responsive transition-all opacity-0 pointer-events-none hide-in-small-landscape"
+          data-i18n="rewardsScreen.startGame"
+        >
+          Start Game
         </button>
       </div>
     </div>
 
+    <!-- Unicorn Modal -->
+    <div id="unicorn-modal" class="unicorn-modal">
+      <div class="modal-content">
+        <div class="modal-image-container">
+          <img id="modal-unicorn-image" src="" alt="" />
+        </div>
+        <div id="modal-unicorn-name" class="modal-name"></div>
+      </div>
+    </div>
+
+    <script src="translations.js"></script>
     <script src="game.js"></script>
   </body>
 </html>
