@@ -733,20 +733,8 @@
           0 8px 32px rgba(0, 0, 0, 0.16),
           0 2px 8px rgba(0, 0, 0, 0.1),
           inset 0 1px 0 rgba(255, 255, 255, 0.3);
-        max-height: 90vh;
+        max-height: 96vh;
         overflow-y: auto;
-      }
-
-      @media (orientation: landscape) and (max-height: 600px) {
-        .glass-frame {
-          max-height: 95vh;
-        }
-      }
-
-      @media (orientation: landscape) and (max-height: 500px) {
-        .glass-frame {
-          max-height: 98vh;
-        }
       }
 
       /* Floating Particle System */
@@ -877,38 +865,16 @@
         }
       }
 
-      @media (orientation: landscape) and (min-width: 768px) {
-        .rewards-grid {
-          max-width: 600px;
-        }
-      }
-
       /* Unicorn card styles */
       .unicorn-card {
         position: relative;
-        width: 65px;
-        height: 65px;
-        border-radius: 8px;
+        width: 55px;
+        height: 55px;
+        border-radius: 6px;
         cursor: pointer;
         transition: all 0.3s ease;
         transform-style: preserve-3d;
         perspective: 1000px;
-      }
-
-      @media (orientation: landscape) and (max-height: 600px) {
-        .unicorn-card {
-          width: 55px;
-          height: 55px;
-          border-radius: 6px;
-        }
-      }
-
-      @media (min-width: 768px) {
-        .unicorn-card {
-          width: 100px;
-          height: 100px;
-          border-radius: 12px;
-        }
       }
 
       .unicorn-card:hover {
@@ -970,7 +936,6 @@
 
       .mystery-icon {
         font-size: 2.5rem;
-        color: white;
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
       }
 
