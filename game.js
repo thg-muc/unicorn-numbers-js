@@ -705,7 +705,6 @@ class GameController {
         'P',
         'Q',
         'R',
-        'S',
         'T',
         'V',
         'W',
