@@ -922,9 +922,6 @@ class GameController {
         return
       }
 
-      const targetNumber = this.gameSession.getCurrentTargetNumber()
-      const rep = this.gameSession.currentRepetition
-
       // Only show number presentation on first repetition of each round
       if (this.gameSession.currentRepetition === 0) {
         this.showNumberPresentationMagically()
@@ -1635,6 +1632,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Handle install prompt for PWA
+  // Store the event for future use when implementing PWA install button
   let deferredPrompt
   window.addEventListener('beforeinstallprompt', e => {
     console.log('PWA install prompt available')
@@ -1648,7 +1646,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('PWA can be installed')
   })
 
-  window.addEventListener('appinstalled', evt => {
+  window.addEventListener('appinstalled', _evt => {
     console.log('PWA was installed successfully')
     // Optionally track this event or show a success message
   })
