@@ -404,6 +404,14 @@ class GameController {
       .getElementById('intro-screen')
       .addEventListener('click', () => this.startGame())
 
+    // Entire rewards screen can be clicked to continue (like intro screen)
+    // But only after a unicorn has been selected
+    document.getElementById('rewards-screen').addEventListener('click', () => {
+      if (this.hasUnlockedThisSession) {
+        this.continueFromRewards()
+      }
+    })
+
     // Rewards screen continue button
     document
       .getElementById('rewards-continue-button')
@@ -1259,9 +1267,10 @@ class GameController {
       cardContainer.appendChild(nameLabel)
 
       // Add click handler to view full size
-      cardContainer.addEventListener('click', () =>
+      cardContainer.addEventListener('click', e => {
+        e.stopPropagation()
         this.openUnicornModal(unicorn)
-      )
+      })
     } else {
       // Show mystery card
       cardFront.className += ' mystery-card'
@@ -1269,9 +1278,10 @@ class GameController {
 
       // Add click handler to unlock if game allows it
       if (this.canUnlockUnicorn()) {
-        cardContainer.addEventListener('click', () =>
+        cardContainer.addEventListener('click', e => {
+          e.stopPropagation()
           this.unlockUnicorn(unicorn.id, cardContainer)
-        )
+        })
       }
     }
 
@@ -1367,9 +1377,10 @@ class GameController {
 
       // Clear any existing click handlers and add new one
       const newCardElement = cardElement.cloneNode(true)
-      newCardElement.addEventListener('click', () =>
+      newCardElement.addEventListener('click', e => {
+        e.stopPropagation()
         this.openUnicornModal(unicorn)
-      )
+      })
       cardElement.parentNode.replaceChild(newCardElement, cardElement)
     }, 400) // Wait for flip animation to complete
   }
