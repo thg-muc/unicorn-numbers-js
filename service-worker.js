@@ -2,6 +2,7 @@ const CACHE_NAME = 'unicorn-numbers-v1'
 const urlsToCache = [
   '/',
   '/index.html',
+  '/translations.js',
   '/game.js',
   '/manifest.json',
   '/assets/icons/icon-192x192.png',
