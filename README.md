@@ -13,6 +13,13 @@ Play by identifying the correct number from the choices presented and earn magic
 - 🎨 **Beautiful Design** - Glassmorphic UI with magical animations
 - 📊 **Progress Tracking** - Star-based scoring system
 
+## 📸 Screenshots
+
+![Unicorn Numbers Intro Screen](assets/screenshots/unicorn_numbers_intro.jpg)
+![Number Selection Gameplay](assets/screenshots/unicorn_numbers_selection.jpg)
+
+_Experience magical number learning with beautiful animations and unicorn rewards!_
+
 ## Quick Start
 
 ### Option 1: Using the start script (Recommended)
