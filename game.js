@@ -1650,4 +1650,20 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('PWA was installed successfully')
     // Optionally track this event or show a success message
   })
+
+  // Vercel Analytics (only in production)
+  if (
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1'
+  ) {
+    window.va =
+      window.va ||
+      function () {
+        ;(window.vaq = window.vaq || []).push(arguments)
+      }
+    const vaScript = document.createElement('script')
+    vaScript.defer = true
+    vaScript.src = '/_vercel/insights/script.js'
+    document.head.appendChild(vaScript)
+  }
 })
