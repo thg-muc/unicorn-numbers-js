@@ -1,5 +1,5 @@
 const CACHE_NAME = 'unicorn-numbers-v1'
-const urlsToCache = [
+const localUrlsToCache = [
   '/',
   '/index.html',
   '/translations.js',
@@ -56,7 +56,9 @@ const urlsToCache = [
   '/assets/rewards/13_dreamy.jpg',
   '/assets/rewards/14_magic.jpg',
   '/assets/rewards/15_elsa.jpg',
-  // External resources (CDN)
+]
+// External resources (CDN) — cached with mode: 'cors' instead of credentials: 'same-origin'
+const cdnUrlsToCache = [
   'https://cdn.tailwindcss.com',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Comic+Neue:wght@400;700&family=Fredoka:wght@400;600&family=Nunito:wght@400;700;900&family=Poppins:wght@400;600;800&display=swap',
 ]
@@ -69,11 +71,13 @@ self.addEventListener('install', event => {
       .open(CACHE_NAME)
       .then(cache => {
         console.log('Service Worker: Caching App Shell')
-        return cache.addAll(
-          urlsToCache.map(
-            url => new Request(url, { credentials: 'same-origin' })
-          )
+        const localRequests = localUrlsToCache.map(
+          url => new Request(url, { credentials: 'same-origin' })
         )
+        const cdnRequests = cdnUrlsToCache.map(
+          url => new Request(url, { mode: 'cors' })
+        )
+        return cache.addAll([...localRequests, ...cdnRequests])
       })
       .then(() => {
         console.log('Service Worker: Cache complete')
@@ -81,6 +85,7 @@ self.addEventListener('install', event => {
       })
       .catch(err => {
         console.error('Service Worker: Cache failed', err)
+        throw err
       })
   )
 })
@@ -130,11 +135,11 @@ self.addEventListener('fetch', event => {
       console.log('Service Worker: Fetching from network:', event.request.url)
       return fetch(event.request)
         .then(response => {
-          // Don't cache if not a valid response
+          // Don't cache if not a valid response (allow same-origin 'basic' and cross-origin 'cors')
           if (
             !response ||
             response.status !== 200 ||
-            response.type !== 'basic'
+            (response.type !== 'basic' && response.type !== 'cors')
           ) {
             return response
           }
