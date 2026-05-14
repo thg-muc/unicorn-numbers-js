@@ -23,15 +23,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Unicorn Numbers" />
+    <meta name="mobile-web-app-capable" content="yes" />
 
     <!-- Theme Colors -->
     <meta name="theme-color" content="#9333ea" />
     <meta name="msapplication-TileColor" content="#9333ea" />
     <meta name="msapplication-config" content="/browserconfig.xml" />
-
-    <!-- iOS Splash Screen Meta Tags -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="mobile-web-app-capable" content="yes" />
 
     <!-- Additional PWA Meta Tags -->
     <meta name="application-name" content="Unicorn Numbers" />
@@ -1349,7 +1346,6 @@
       <div
         id="number-presentation"
         class="hidden text-center glass-frame rounded-lg p-3 sm:p-4 md:p-6 lg:p-8 cursor-pointer w-full max-w-md md:max-w-2xl flex flex-col justify-center"
-        onclick="gameController.continueToChoices()"
       >
         <div class="mb-6 md:mb-4">
           <span class="text-xl md:text-2xl text-gray-600"
@@ -1474,7 +1470,7 @@
     <div id="unicorn-modal" class="unicorn-modal">
       <div class="modal-content">
         <div class="modal-image-container">
-          <img id="modal-unicorn-image" src="" alt="" />
+          <img id="modal-unicorn-image" alt="" />
         </div>
         <div id="modal-unicorn-name" class="modal-name"></div>
       </div>
