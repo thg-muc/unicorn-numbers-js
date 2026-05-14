@@ -28,6 +28,7 @@ class AudioManager {
   }
 
   getTranslation(key) {
+    if (!this.language) return key
     const keys = key.split('.')
     let translation = translations[this.language]
 
@@ -58,6 +59,10 @@ class AudioManager {
 
   playNumberAudio(number) {
     return new Promise((resolve, reject) => {
+      if (!this.language) {
+        resolve()
+        return
+      }
       // Stop any currently playing audio
       if (this.currentAudio) {
         this.currentAudio.pause()
@@ -76,7 +81,7 @@ class AudioManager {
         reject(e)
       })
 
-      this.currentAudio.play()
+      this.currentAudio.play().catch(e => reject(e))
     })
   }
 
@@ -92,6 +97,7 @@ class AudioManager {
   }
 
   playIntroAudio() {
+    this.stopIntroAudio()
     // Simple intro audio playback on user interaction
     const audioPath = `assets/audio/${this.language}/intro.mp3`
     this.introAudio = new Audio(audioPath)
@@ -113,6 +119,7 @@ class AudioManager {
   }
 
   playUnicornsAudio() {
+    this.stopIntroAudio()
     // Play unicorns audio for rewards screen
     const audioPath = `assets/audio/${this.language}/unicorns.mp3`
     this.introAudio = new Audio(audioPath)
@@ -240,7 +247,9 @@ class RewardsManager {
       const saved = localStorage.getItem('unicornRewards')
       if (saved) {
         const progress = JSON.parse(saved)
-        this.unlockedIds = new Set(progress.unlockedIds || [])
+        this.unlockedIds = new Set(
+          Array.isArray(progress.unlockedIds) ? progress.unlockedIds : []
+        )
       }
     } catch (error) {
       console.warn('Could not load rewards progress:', error)
@@ -404,6 +413,10 @@ class GameController {
       .getElementById('intro-screen')
       .addEventListener('click', () => this.startGame())
 
+    document
+      .getElementById('number-presentation')
+      .addEventListener('click', () => this.continueToChoices())
+
     // Entire rewards screen can be clicked to continue (like intro screen)
     // But only after a unicorn has been selected
     document.getElementById('rewards-screen').addEventListener('click', () => {
@@ -433,11 +446,6 @@ class GameController {
         }
       }
     })
-  }
-
-  startGameWithLanguage(language) {
-    this.audioManager.setLanguage(language)
-    this.startGame()
   }
 
   handleSeeUnicornsClick() {
@@ -509,48 +517,15 @@ class GameController {
     } else {
       console.log('→ Going directly to choices (repetition)')
       // Go directly to choices for subsequent repetitions
+      this.gameSession.canContinue = true
       this.continueToChoices()
     }
   }
 
-  async showNumberPresentation() {
+  showNumberPresentation() {
     this.showPresentationScreen()
     this.updatePresentationDisplay()
-
-    // Record presentation start time and disable continue initially
-    this.gameSession.presentationStartTime = Date.now()
-    this.gameSession.canContinue = false
-
-    const targetNumber = this.gameSession.getCurrentTargetNumber()
-    const emoji = this.audioManager.getEmoji(targetNumber)
-
-    // Update emoji element
-    document.getElementById('presented-emoji').textContent = emoji
-
-    // Start playing audio
-    try {
-      this.audioManager.playNumberAudio(targetNumber)
-
-      // Schedule emoji transition after 3.5 seconds
-      setTimeout(() => {
-        this.triggerEmojiTransition()
-      }, 3500)
-
-      // Enable continue after minimum time (5 seconds for Easy mode)
-      setTimeout(() => {
-        this.enableContinue()
-      }, this.gameSession.minPresentationTime)
-    } catch (error) {
-      console.warn('Audio playback failed:', error)
-      // If audio fails, still show emoji after 3.5 seconds and enable continue after 5
-      setTimeout(() => {
-        this.triggerEmojiTransition()
-      }, 3500)
-
-      setTimeout(() => {
-        this.enableContinue()
-      }, this.gameSession.minPresentationTime)
-    }
+    this.startNumberPresentationFlow()
   }
 
   triggerEmojiTransition() {
@@ -573,10 +548,8 @@ class GameController {
     instructionElement.textContent = this.audioManager.getTranslation(
       'presentationScreen.tapToContinue'
     )
-    instructionElement.className = instructionElement.className.replace(
-      'text-gray-500',
-      'text-green-700'
-    )
+    instructionElement.classList.replace('text-gray-500', 'text-green-700') ||
+      instructionElement.classList.add('text-green-700')
 
     // Add subtle pulse animation to indicate ready
     const presentationScreen = document.getElementById('number-presentation')
@@ -596,20 +569,18 @@ class GameController {
       instructionElement.textContent = this.audioManager.getTranslation(
         'presentationScreen.pleaseWait'
       )
-      instructionElement.className = instructionElement.className.replace(
-        'text-gray-500',
-        'text-amber-500'
-      )
+      instructionElement.classList.replace('text-gray-500', 'text-amber-500') ||
+        instructionElement.classList.add('text-amber-500')
 
       setTimeout(() => {
         if (!this.gameSession.canContinue) {
           instructionElement.textContent = this.audioManager.getTranslation(
             'presentationScreen.listen'
           )
-          instructionElement.className = instructionElement.className.replace(
+          instructionElement.classList.replace(
             'text-amber-500',
             'text-gray-500'
-          )
+          ) || instructionElement.classList.add('text-gray-500')
         }
       }, 1000)
       return
@@ -642,34 +613,26 @@ class GameController {
     numberElement.textContent = this.gameSession.getCurrentTargetNumber()
 
     // Reset all elements to initial state
-    numberElement.className =
-      numberElement.className
-        .replace('number-presentation', '')
-        .replace('number-fade-out', '')
-        .trim() + ' number-hidden'
+    numberElement.classList.remove('number-presentation', 'number-fade-out')
+    numberElement.classList.add('number-hidden')
 
-    emojiElement.className =
-      emojiElement.className.replace('emoji-fade-in', '').trim() +
-      ' emoji-hidden'
+    emojiElement.classList.remove('emoji-fade-in')
+    emojiElement.classList.add('emoji-hidden')
 
     // Reset instruction text
     instructionElement.textContent = this.audioManager.getTranslation(
       'presentationScreen.listen'
     )
-    instructionElement.className = instructionElement.className.replace(
-      'text-green-700',
-      'text-gray-500'
-    )
+    instructionElement.classList.replace('text-green-700', 'text-gray-500') ||
+      instructionElement.classList.remove('text-green-700')
 
     // Reset presentation screen cursor
     document.getElementById('number-presentation').style.cursor = 'default'
 
     // Start number animation after brief delay
     setTimeout(() => {
-      numberElement.className = numberElement.className.replace(
-        'number-hidden',
-        'number-presentation'
-      )
+      numberElement.classList.remove('number-hidden')
+      numberElement.classList.add('number-presentation')
     }, 10)
   }
 
@@ -822,13 +785,13 @@ class GameController {
       const currentFont =
         button.className.match(/font-\w+/g)?.join(' ') || 'font-bold'
 
-      if (button.textContent == selectedChoice) {
+      if (button.textContent === String(selectedChoice)) {
         if (isCorrect) {
           button.className = `bg-green-500 hover:bg-green-600 text-white text-[min(12vw,4rem)] md:text-6xl lg:text-7xl w-[min(28vw,8rem)] h-[min(28vw,8rem)] md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center success-animation sparkle-effect ${currentFont}`
         } else {
           button.className = `bg-red-500 hover:bg-red-600 text-white text-[min(12vw,4rem)] md:text-6xl lg:text-7xl w-[min(28vw,8rem)] h-[min(28vw,8rem)] md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${currentFont}`
         }
-      } else if (button.textContent == targetNumber && !isCorrect) {
+      } else if (button.textContent === String(targetNumber) && !isCorrect) {
         button.className = `bg-green-300 hover:bg-green-400 text-white text-[min(12vw,4rem)] md:text-6xl lg:text-7xl w-[min(28vw,8rem)] h-[min(28vw,8rem)] md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-lg tap-target transition-colors duration-200 flex items-center justify-center ${currentFont}`
       }
     })
@@ -973,30 +936,20 @@ class GameController {
     // Update emoji element
     document.getElementById('presented-emoji').textContent = emoji
 
-    // Start playing audio
-    try {
-      this.audioManager.playNumberAudio(targetNumber)
-
-      // Schedule emoji transition after 3.5 seconds
-      setTimeout(() => {
-        this.triggerEmojiTransition()
-      }, 3500)
-
-      // Enable continue after minimum time (5 seconds for Easy mode)
-      setTimeout(() => {
-        this.enableContinue()
-      }, this.gameSession.minPresentationTime)
-    } catch (error) {
+    // Start playing audio, then schedule emoji transition and continue enable
+    this.audioManager.playNumberAudio(targetNumber).catch(error => {
       console.warn('Audio playback failed:', error)
-      // If audio fails, still show emoji after 3.5 seconds and enable continue after 5
-      setTimeout(() => {
-        this.triggerEmojiTransition()
-      }, 3500)
+    })
 
-      setTimeout(() => {
-        this.enableContinue()
-      }, this.gameSession.minPresentationTime)
-    }
+    // Schedule emoji transition after 3.5 seconds
+    setTimeout(() => {
+      this.triggerEmojiTransition()
+    }, 3500)
+
+    // Enable continue after minimum time (5 seconds for Easy mode)
+    setTimeout(() => {
+      this.enableContinue()
+    }, this.gameSession.minPresentationTime)
   }
 
   showEndScreen() {
@@ -1343,7 +1296,6 @@ class GameController {
           'rewardsScreen.allUnlocked'
         )
       }
-      this.updateProgressDisplay()
     }, 1000)
   }
 
@@ -1393,17 +1345,6 @@ class GameController {
     }, 2000)
   }
 
-  updateProgressDisplay() {
-    const progressElement = document.getElementById('collection-progress')
-    const progressText = this.audioManager.getTranslation(
-      'rewardsScreen.progress'
-    )
-    progressElement.textContent = progressText(
-      this.rewardsManager.getUnlockedCount(),
-      this.rewardsManager.getTotalCount()
-    )
-  }
-
   openUnicornModal(unicorn) {
     const modal = document.getElementById('unicorn-modal')
     const image = document.getElementById('modal-unicorn-image')
@@ -1439,12 +1380,7 @@ class GameController {
     } else {
       // No language set, show start screen with language selection
       this.fadeToScreen('start-screen')
-      this.showStartScreen()
     }
-  }
-
-  showStartScreen() {
-    // Reset for new game
   }
 }
 
@@ -1579,6 +1515,7 @@ class ParticleSystem {
   }
 
   resume() {
+    this.destroy()
     this.isActive = true
     this.init()
   }
